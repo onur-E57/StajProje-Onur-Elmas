@@ -42,7 +42,7 @@ namespace StajProje.WebApi.Controllers
             {
                 _context.Chefs.Remove(value);
                 _context.SaveChanges();
-                return Ok("Şef başarılı bir şekilde kaldırılmıştır");
+                return Ok("Şef başarılı bir şekilde sistemden kaldırılmıştır");
             }
         }
 
