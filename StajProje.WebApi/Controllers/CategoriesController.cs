@@ -48,7 +48,7 @@ namespace StajProje.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetByIdCategoryList(int id)
+        public IActionResult GetCategory(int id)
         {
             var value = _context.Categories.Find(id);
             if (value == null)

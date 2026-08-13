@@ -1,10 +1,16 @@
+using FluentValidation;
 using StajProje.WebApi.Context;
+using StajProje.WebApi.Entities;
+using StajProje.WebApi.ValidationRules;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddDbContext<ApiContext>();
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddScoped<IValidator<Product>, ProductValidator>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

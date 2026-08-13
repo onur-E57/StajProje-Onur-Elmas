@@ -47,7 +47,7 @@ namespace StajProje.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetByIdChefList(int id)
+        public IActionResult GetChef(int id)
         {
             var value = _context.Chefs.Find(id);
             if(value == null)
