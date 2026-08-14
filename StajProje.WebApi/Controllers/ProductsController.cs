@@ -77,8 +77,12 @@ namespace StajProje.WebApi.Controllers
         [HttpPut]
         public IActionResult UpdateProduct(UpdateProductDto updateProductDto)
         {
-            var value = _mapper.Map<Product>(updateProductDto);
-            _context.Products.Update(value);
+            var value = _validator.Validate(_mapper.Map<Product>(updateProductDto));
+            if (!value.IsValid)
+            {
+                return BadRequest(value.Errors.Select(x => x.ErrorMessage));
+            }
+            _context.Products.Update(_mapper.Map<Product>(updateProductDto));
             _context.SaveChanges();
             return Ok("Ürün başarıyla güncellendi.");
         }
