@@ -5,6 +5,7 @@ using StajProje.WebApi.Dtos.ProductDtos;
 using StajProje.WebApi.Entities;
 using FluentValidation;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace StajProje.WebApi.Controllers
 {
@@ -47,7 +48,7 @@ namespace StajProje.WebApi.Controllers
             var value = _mapper.Map<Product>(createProductDto);
             _context.Products.Add(value);
             _context.SaveChanges();
-            return Ok("Ürün başarıyla eklendi.");
+            return Ok("Ürün ve kategori başarıyla eklendi.");
         }
 
         [HttpDelete("{id}")]
@@ -85,6 +86,13 @@ namespace StajProje.WebApi.Controllers
             _context.Products.Update(_mapper.Map<Product>(updateProductDto));
             _context.SaveChanges();
             return Ok("Ürün başarıyla güncellendi.");
+        }
+
+        [HttpGet("ProductListWithCategory")]
+        public IActionResult ProductListWithCategory()
+        {
+            var values = _context.Products.Include(x => x.Category).ToList();
+            return Ok(_mapper.Map<List<ResultProductWithCategoryDto>>(values)); 
         }
     }
 }

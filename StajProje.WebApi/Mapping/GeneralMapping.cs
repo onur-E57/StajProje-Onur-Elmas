@@ -24,6 +24,7 @@ namespace StajProje.WebApi.Mapping
             CreateMap<Product, UpdateProductDto>().ReverseMap();
             CreateMap<Product, GetByIdProductDto>().ReverseMap();
             CreateMap<Product, CreateProductDto>().ReverseMap();
+            CreateMap<Product, ResultProductWithCategoryDto>().ForMember(x=>x.CategoryName, y=>y.MapFrom(z=>z.Category.CategoryName)).ReverseMap();
         }
     }
 }
