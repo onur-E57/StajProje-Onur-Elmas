@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace ApiProjeKampi.WebUI.Models
+namespace StajProje.WebUI.Models
 {
     public class ChatHub : Hub
     {

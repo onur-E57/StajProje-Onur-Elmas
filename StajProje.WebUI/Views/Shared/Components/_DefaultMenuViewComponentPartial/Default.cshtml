@@ -1,0 +1,17 @@
+﻿<section id="menu" class="menu section">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+        <h2>Menü</h2>
+        <p><span>Lezzet Dolu</span> <span class="description-title">Menümüz</span></p>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+
+        @await Component.InvokeAsync("_DefaultMenuCategoryComponentPartial")
+        @await Component.InvokeAsync("_DefaultMenuProductComponentPartial")
+        
+
+    </div>
+
+</section>

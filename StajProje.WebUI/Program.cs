@@ -2,6 +2,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 1. Projeye HTML (View) desteğini ekliyoruz
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 

@@ -7,50 +7,50 @@ namespace StajProje.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class TestimonialsController : ControllerBase
     {
         private readonly ApiContext _context;
-        public CategoriesController(ApiContext context)
+        public TestimonialsController(ApiContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        public IActionResult CategoryList()
+        public IActionResult TestimonialList()
         {
-            var values = _context.Categories.ToList();
+            var values = _context.Testimonials.ToList();
             return Ok(values);
         }
 
         [HttpPost]
-        public IActionResult CreateCategory(Category category)
+        public IActionResult CreateTestimonial(Testimonial testimonial)
         {
-            _context.Categories.Add(category);
+            _context.Testimonials.Add(testimonial);
             _context.SaveChanges();
-            return Ok("Kategori ekleme işlemi başarılı");
+            return Ok("Ekleme işlemi başarılı");
         }
 
         [HttpDelete]
-        public IActionResult DeleteCategory(int id)
+        public IActionResult DeleteTestimonial(int id)
         {
-            var value = _context.Categories.Find(id);
+            var value = _context.Testimonials.Find(id);
             if (value == null)
             {
                 return NotFound();
             }
             else
             {
-                _context.Categories.Remove(value);
+                _context.Testimonials.Remove(value);
                 _context.SaveChanges();
-                return Ok("Kategori silme işlemi başarılı");
+                return Ok("Silme işlemi başarılı");
             }
 
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetCategory(int id)
+        public IActionResult GetTestimonial(int id)
         {
-            var value = _context.Categories.Find(id);
+            var value = _context.Testimonials.Find(id);
             if (value == null)
             {
                 return NotFound();
@@ -62,11 +62,11 @@ namespace StajProje.WebApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateCategory(Category category)
+        public IActionResult UpdateTestimonial(Testimonial testimonial)
         {
-            _context.Categories.Update(category);
+            _context.Testimonials.Update(testimonial);
             _context.SaveChanges();
-            return Ok("Kategori güncelleme işlemi başarılı");
+            return Ok("Güncelleme işlemi başarılı");
         }
     }
 }

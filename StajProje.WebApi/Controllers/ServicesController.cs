@@ -7,50 +7,50 @@ namespace StajProje.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class ServicesController : ControllerBase
     {
         private readonly ApiContext _context;
-        public CategoriesController(ApiContext context)
+        public ServicesController(ApiContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        public IActionResult CategoryList()
+        public IActionResult ServiceList()
         {
-            var values = _context.Categories.ToList();
+            var values = _context.Services.ToList();
             return Ok(values);
         }
 
         [HttpPost]
-        public IActionResult CreateCategory(Category category)
+        public IActionResult CreateService(Service service)
         {
-            _context.Categories.Add(category);
+            _context.Services.Add(service);
             _context.SaveChanges();
-            return Ok("Kategori ekleme işlemi başarılı");
+            return Ok("Ekleme işlemi başarılı");
         }
 
         [HttpDelete]
-        public IActionResult DeleteCategory(int id)
+        public IActionResult DeleteService(int id)
         {
-            var value = _context.Categories.Find(id);
+            var value = _context.Services.Find(id);
             if (value == null)
             {
                 return NotFound();
             }
             else
             {
-                _context.Categories.Remove(value);
+                _context.Services.Remove(value);
                 _context.SaveChanges();
-                return Ok("Kategori silme işlemi başarılı");
+                return Ok("Silme işlemi başarılı");
             }
 
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetCategory(int id)
+        public IActionResult GetService(int id)
         {
-            var value = _context.Categories.Find(id);
+            var value = _context.Services.Find(id);
             if (value == null)
             {
                 return NotFound();
@@ -62,11 +62,11 @@ namespace StajProje.WebApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateCategory(Category category)
+        public IActionResult UpdateService(Service service)
         {
-            _context.Categories.Update(category);
+            _context.Services.Update(service);
             _context.SaveChanges();
-            return Ok("Kategori güncelleme işlemi başarılı");
+            return Ok("Güncelleme işlemi başarılı");
         }
     }
 }

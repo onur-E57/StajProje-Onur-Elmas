@@ -1,4 +1,4 @@
-namespace ApiProjeKampi.WebUI.Models
+namespace StajProje.WebUI.Models
 {
     public class ErrorViewModel
     {
