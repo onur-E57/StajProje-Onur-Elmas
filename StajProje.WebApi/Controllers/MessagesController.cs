@@ -71,5 +71,12 @@ namespace StajProje.WebApi.Controllers
             _context.SaveChanges();
             return Ok("Güncelleme işlemi başarılı");
         }
+
+        [HttpGet("MessageListByIsReadFalse")]
+        public IActionResult MessageListByIsReadFalse()
+        {
+            var values = _context.Messages.Where(x=>x.IsRead==false).ToList();
+            return Ok(values);
+        }
     }
 }
