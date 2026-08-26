@@ -1,4 +1,4 @@
-﻿namespace StajProje.WebApi.Dtos.ProductDtos
+﻿namespace StajProje.WebUI.Dtos.ProductDtos
 {
     public class UpdateProductDto
     {

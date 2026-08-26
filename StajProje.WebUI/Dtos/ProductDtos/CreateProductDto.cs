@@ -1,8 +1,7 @@
-﻿namespace StajProje.WebApi.Dtos.ProductDtos
+﻿namespace StajProje.WebUI.Dtos.ProductDtos
 {
-    public class UpdateProductDto
+    public class CreateProductDto
     {
-        public int ProductId { get; set; }
         public string ProductName { get; set; }
         public string ProductDescription { get; set; }
         public decimal ProductPrice { get; set; }

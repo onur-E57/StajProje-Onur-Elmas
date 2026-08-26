@@ -1,0 +1,67 @@
+﻿@* 1. DTO Modelini değiştiriyoruz *@
+@model List<ResultProductWithCategoryDto>
+@{
+    ViewData["Title"] = "Ürün Listesi";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+    int count = 0;
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Ürün Listesi</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Ürün Adı</th>
+                                    <th scope="col">Kategori</th> <!-- 2. YENİ BAŞLIK -->
+                                    <th scope="col">Ürün Fiyatı</th>
+                                    <th scope="col">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    count++;
+                                    <tr>
+                                        <th scope="row">@count</th>
+                                        <td>@item.ProductName</td>
+                                        <td>@item.CategoryName</td> <!-- 3. YENİ VERİ -->
+                                        <td>₺ @item.ProductPrice</td>
+                                        <td>
+                                            <a href="/Product/DeleteProduct/@item.ProductId" class="btn btn-danger btn-sm">Sil</a>
+                                            <a href="/Product/UpdateProduct/@item.ProductId" class="btn btn-warning btn-sm">Güncelle</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <a href="/Product/CreateProduct" class="btn btn-info btn-sm">+ Yeni Ürün</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <!-- SweetAlert2 kütüphanesini anında projeye dahil ediyoruz -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            title: 'Başarılı!',
+            text: '@Html.Raw(TempData["SuccessMessage"])',
+            icon: 'success',
+            confirmButtonText: 'Tamam',
+            timer: 2500,
+            timerProgressBar: true
+        });
+    </script>
+}

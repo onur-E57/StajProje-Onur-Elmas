@@ -1,0 +1,46 @@
+﻿@model GetFeatureByIdDto
+
+@{
+    ViewData["Title"] = "UpdateFeature";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Özellik Güncelleme Sayfası</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            <input type="hidden" asp-for="FeatureId" />
+                            <div class="form-group">
+                                <label asp-for="Title">Özellik Adı</label>
+                                <input type="text" asp-for="Title" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SubTitle">Özellik Alt Başlığı</label>
+                                <input type="text" asp-for="SubTitle" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Description">Özellik Açıklaması</label>
+                                <textarea asp-for="Description" rows="5" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="VideoUrl">Özellik Video URL</label>
+                                <input type="text" asp-for="VideoUrl" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ImageUrl">Özellik Resmi</label>
+                                <input type="text" asp-for="ImageUrl" class="form-control" />
+                            </div>
+                            <button class="btn btn-success">Güncelle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
