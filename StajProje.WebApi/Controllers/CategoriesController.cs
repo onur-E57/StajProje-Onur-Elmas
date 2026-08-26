@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StajProje.WebApi.Context;
 using StajProje.WebApi.Dtos.CategoryDtos;
-using StajProje.WebApi.Dtos.FeatureDtos;
 using StajProje.WebApi.Entities;
 
 namespace StajProje.WebApi.Controllers
@@ -68,11 +66,19 @@ namespace StajProje.WebApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateCategory(Category category)
+        public IActionResult UpdateCategory(UpdateCategoryDto updateCategoryDto)
         {
-            _context.Categories.Update(category);
-            _context.SaveChanges();
-            return Ok("Kategori güncelleme işlemi başarılı");
+            var value = _context.Categories.Find(updateCategoryDto.CategoryId);
+            if (value == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                _mapper.Map(updateCategoryDto, value);
+                _context.SaveChanges();
+                return Ok("Kategori güncelleme işlemi başarılı");
+            }
         }
     }
 }

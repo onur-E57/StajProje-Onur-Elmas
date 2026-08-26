@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using StajProje.WebApi.Dtos.CategoryDtos;
 using StajProje.WebApi.Dtos.FeatureDtos;
 using StajProje.WebApi.Dtos.MessageDtos;
 using StajProje.WebApi.Dtos.ProductDtos;
@@ -10,6 +11,9 @@ namespace StajProje.WebApi.Mapping
     {
         public GeneralMapping()
         {
+            CreateMap<Category, CreateCategoryDto>().ReverseMap();
+            CreateMap<Category, UpdateCategoryDto>().ReverseMap();
+
             CreateMap<Feature, ResultFeatureDto>().ReverseMap();
             CreateMap<Feature, UpdateFeatureDto>().ReverseMap();
             CreateMap<Feature, GetByIdFeatureDto>().ReverseMap();
