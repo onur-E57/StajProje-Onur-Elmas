@@ -1,6 +1,6 @@
-﻿@model List<ResultProductWithCategoryDto>
+﻿@model List<ResultChefDto>
 @{
-    ViewData["Title"] = "Ürün Listesi";
+    ViewData["Title"] = "Şef Listesi";
     Layout = "~/Views/AdminLayout/Index.cshtml";
     int count = 0;
 }
@@ -11,16 +11,16 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Ürün Listesi</h4>
+                        <h4>Şef Listesi</h4>
                     </div>
                     <div class="card-body">
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Ürün Adı</th>
-                                    <th scope="col">Kategori</th>
-                                    <th scope="col">Ürün Fiyatı</th>
+                                    <th scope="col">Şef İsim Soyisim</th>
+                                    <th scope="col">Şef Ünvanı</th>
+                                    <th scope="col">Şef Açıklaması</th>
                                     <th scope="col">İşlemler</th>
                                 </tr>
                             </thead>
@@ -30,18 +30,30 @@
                                     count++;
                                     <tr>
                                         <th scope="row">@count</th>
-                                        <td>@item.ProductName</td>
-                                        <td>@item.CategoryName</td>
-                                        <td>₺ @item.ProductPrice</td>
+                                        <td>@item.NameSurname</td>
+                                        <td>@item.Title</td>
                                         <td>
-                                            <a href="/Product/DeleteProduct/@item.ProductId" class="btn btn-danger btn-sm">Sil</a>
-                                            <a href="/Product/UpdateProduct/@item.ProductId" class="btn btn-warning btn-sm">Güncelle</a>
+                                            @(item.Description != null && item.Description.Length > 50
+                                                ? item.Description.Substring(0, 50) + "..."
+                                                : item.Description)
+                                        </td>
+                                        <td>
+                                            <a href="/Chef/DeleteChef/@item.ChefId" class="btn btn-danger btn-sm">Sil</a>
+                                            <a href="/Chef/UpdateChef/@item.ChefId" class="btn btn-warning btn-sm">Güncelle</a>
                                         </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
-                        <a href="/Product/CreateProduct" class="btn btn-info btn-sm">+ Yeni Ürün</a>
+                        @if (Model.Count == 3)
+                        {
+                            <a href="/Chef/CreateChef" class="btn btn-info btn-sm" onclick="return false">Şef Mevcut</a>
+                        }
+                        else
+                        {
+                            <a href="/Chef/CreateChef" class="btn btn-info btn-sm">+ Yeni Şef</a>
+                        }
+
                     </div>
                 </div>
             </div>
@@ -49,8 +61,10 @@
     </div>
 </section>
 
+
 @if (TempData["SuccessMessage"] != null)
 {
+    <!-- SweetAlert2 kütüphanesini anında projeye dahil ediyoruz -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         Swal.fire({

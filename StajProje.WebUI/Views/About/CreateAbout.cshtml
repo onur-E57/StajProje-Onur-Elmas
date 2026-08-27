@@ -1,7 +1,7 @@
-﻿@model GetAboutByIdDto
+﻿@model CreateAboutDto
 
 @{
-    ViewData["Title"] = "UpdateAbout";
+    ViewData["Title"] = "CreateAbout";
     Layout = "~/Views/AdminLayout/Index.cshtml";
 }
 
@@ -15,7 +15,6 @@
                     </div>
                     <div class="card-body">
                         <form method="post">
-                            <input type="hidden" asp-for="AboutId" />
                             <div class="form-group">
                                 <label asp-for="Title">Hakkımızda Başlığı</label>
                                 <input type="text" asp-for="Title" class="form-control" />

@@ -4,6 +4,7 @@ using StajProje.WebApi.Dtos.CategoryDtos;
 using StajProje.WebApi.Dtos.FeatureDtos;
 using StajProje.WebApi.Dtos.MessageDtos;
 using StajProje.WebApi.Dtos.ProductDtos;
+using StajProje.WebApi.Dtos.ReservationDtos;
 using StajProje.WebApi.Entities;
 
 namespace StajProje.WebApi.Mapping
@@ -12,6 +13,11 @@ namespace StajProje.WebApi.Mapping
     {
         public GeneralMapping()
         {
+            CreateMap<Reservation, CreateReservationDto>().ReverseMap();
+            CreateMap<Reservation, UpdateReservationDto>().ReverseMap();
+            CreateMap<Reservation, GetByIdReservationDto>().ReverseMap();
+            CreateMap<Reservation, ResultReservationDto>().ReverseMap();
+
             CreateMap<Category, CreateCategoryDto>().ReverseMap();
             CreateMap<Category, UpdateCategoryDto>().ReverseMap();
 

@@ -1,0 +1,42 @@
+﻿@model CreateChefDto
+
+@{
+    ViewData["Title"] = "CreateChef";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Şef Ekleme Sayfası</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            <div class="form-group">
+                                <label asp-for="NameSurname">Şef İsim Soyisim</label>
+                                <input type="text" asp-for="NameSurname" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Title">Şef Ünvanı</label>
+                                <input type="text" asp-for="Title" class="form-control" />
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Description">Şef Açıklaması</label>
+                                <textarea asp-for="Description" rows="5" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ImageUrl">Şef Resmi</label>
+                                <input type="text" asp-for="ImageUrl" class="form-control" />
+                            </div>
+                            <button class="btn btn-success">Ekle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
