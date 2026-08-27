@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using StajProje.WebApi.Dtos.AboutDtos;
 using StajProje.WebApi.Dtos.CategoryDtos;
 using StajProje.WebApi.Dtos.FeatureDtos;
 using StajProje.WebApi.Dtos.MessageDtos;
@@ -29,6 +30,11 @@ namespace StajProje.WebApi.Mapping
             CreateMap<Product, GetByIdProductDto>().ReverseMap();
             CreateMap<Product, CreateProductDto>().ReverseMap();
             CreateMap<Product, ResultProductWithCategoryDto>().ForMember(x=>x.CategoryName, y=>y.MapFrom(z=>z.Category.CategoryName)).ReverseMap();
+
+            CreateMap<About, CreateAboutDto>().ReverseMap();
+            CreateMap<About, UpdateAboutDto>().ReverseMap();
+            CreateMap<About, GetByIdAboutDto>().ReverseMap();
+            CreateMap<About, ResultAboutDto>().ReverseMap();
         }
     }
 }

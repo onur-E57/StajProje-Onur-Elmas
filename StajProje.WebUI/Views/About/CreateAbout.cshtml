@@ -1,7 +1,7 @@
-﻿@model GetFeatureByIdDto
+﻿@model GetAboutByIdDto
 
 @{
-    ViewData["Title"] = "UpdateFeature";
+    ViewData["Title"] = "UpdateAbout";
     Layout = "~/Views/AdminLayout/Index.cshtml";
 }
 
@@ -11,30 +11,38 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Özellik Güncelleme Sayfası</h4>
+                        <h4>Hakkımızda Ekleme Sayfası</h4>
                     </div>
                     <div class="card-body">
                         <form method="post">
-                            <input type="hidden" asp-for="FeatureId" />
+                            <input type="hidden" asp-for="AboutId" />
                             <div class="form-group">
-                                <label asp-for="Title">Özellik Adı</label>
+                                <label asp-for="Title">Hakkımızda Başlığı</label>
                                 <input type="text" asp-for="Title" class="form-control" />
                             </div>
                             <div class="form-group">
-                                <label asp-for="SubTitle">Özellik Alt Başlığı</label>
+                                <label asp-for="SubTitle">Hakkımızda Alt Başlığı</label>
                                 <input type="text" asp-for="SubTitle" class="form-control" />
                             </div>
                             <div class="form-group">
-                                <label asp-for="Description">Özellik Açıklaması</label>
+                                <label asp-for="Description">Hakkımızda Açıklaması</label>
                                 <textarea asp-for="Description" rows="5" class="form-control"></textarea>
                             </div>
                             <div class="form-group">
-                                <label asp-for="VideoUrl">Özellik Video URL</label>
+                                <label asp-for="VideoUrl">Hakkımızda Video URL</label>
                                 <input type="text" asp-for="VideoUrl" class="form-control" />
                             </div>
                             <div class="form-group">
-                                <label asp-for="ImageUrl">Özellik Resmi</label>
+                                <label asp-for="VideoCoverImageUrl">Hakkımızda Video Kapak Resmi URL</label>
+                                <input type="text" asp-for="VideoCoverImageUrl" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ImageUrl">Hakkımızda Resmi</label>
                                 <input type="text" asp-for="ImageUrl" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ReservationNumber">Hakkımızda Rezervasyon Numarası</label>
+                                <input type="text" asp-for="ReservationNumber" class="form-control" />
                             </div>
                             <button class="btn btn-success">Ekle</button>
                         </form>
