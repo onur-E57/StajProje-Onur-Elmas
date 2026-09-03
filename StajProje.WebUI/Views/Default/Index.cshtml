@@ -93,6 +93,64 @@
 
     @await Component.InvokeAsync("_FooterDefaultComponentPartial")
 
+    <!-- SweetAlert2 kütüphanesi yüklü değilse -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+            function openAiChefModal() {
+                Swal.fire({
+                    title: '🤖 Yummy AI Şef',
+                    text: 'Dolabında ne var? Malzemelerini yaz, şefimiz sana özel bir tarif hazırlasın!',
+                    input: 'textarea',
+                    inputPlaceholder: 'Örn: 2 yumurta, biraz kaşar, domates, bayat ekmek...',
+                    showCancelButton: true,
+                    confirmButtonText: 'Tarif Oluştur 🍳',
+                    cancelButtonText: 'Vazgeç',
+                    confirmButtonColor: '#ce1212',
+                    showLoaderOnConfirm: true,
+                    preConfirm: (promptText) => {
+                        if (!promptText || promptText.trim() === '') {
+                            Swal.showValidationMessage('Lütfen en az bir veya iki malzeme yazın!');
+                            return false;
+                        }
+
+                        return fetch('/AI/CreateRecipeWithGemini', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ prompt: promptText })
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(response.statusText);
+                                }
+                                return response.json();
+                            })
+                            .catch(error => {
+                                Swal.showValidationMessage(`İstek başarısız oldu: ${error}`);
+                            });
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (result.value.success) {
+                            Swal.fire({
+                                title: '👨‍🍳 Şefin Sana Özel Tarifi',
+                                html: `<div style="text-align: left; max-height: 400px; overflow-y: auto; white-space: pre-line; padding: 10px; background: #fdfdfd; border-radius: 8px; font-size: 14px; line-height: 1.6;">${result.value.recipe}</div>`,
+                                icon: 'success',
+                                confirmButtonText: 'Harika, Teşekkürler!',
+                                confirmButtonColor: '#ce1212',
+                                width: '650px'
+                            });
+                        } else {
+                            Swal.fire('Hata', result.value.message, 'error');
+                        }
+                    }
+                });
+            }
+    </script>
+
 </body>
 
 </html>
