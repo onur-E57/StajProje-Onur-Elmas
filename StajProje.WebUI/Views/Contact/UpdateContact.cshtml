@@ -1,0 +1,46 @@
+﻿@model GetByIdContactDto
+
+@{
+    ViewData["Title"] = "UpdateContact";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>İletişim Güncelleme Sayfası</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            <input type="hidden" asp-for="ContactId" />
+                            <div class="form-group">
+                                <label asp-for="MapLocation">Harita Adresi</label>
+                                <input type="text" asp-for="MapLocation" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Address">Adres</label>
+                                <input type="text" asp-for="Address" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Phone">Numara</label>
+                                <input type="text" asp-for="Phone" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Email">E-posta</label>
+                                <input type="text" asp-for="Email" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="OpenHours">Açılış Saatleri</label>
+                                <textarea asp-for="OpenHours" rows="5" class="form-control"></textarea>
+                            </div>
+                            <button class="btn btn-success">Güncelle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

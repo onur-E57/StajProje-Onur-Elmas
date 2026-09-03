@@ -1,0 +1,68 @@
+﻿@model List<ResultImageDto>
+@{
+    ViewData["Title"] = "Görsel Listesi";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+    int count = 0;
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Galeri Alan Listesi</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Görsel Başlığı</th>
+                                    <th scope="col">Görsel URL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    count++;
+                                    <tr>
+                                        <th scope="row">@count</th>
+                                        <td>@item.Title</td>
+                                        <td>
+                                            @(item.ImageUrl != null && item.ImageUrl.Length > 50
+                                                ? item.ImageUrl.Substring(0, 50) + "..."
+                                                : item.ImageUrl)
+                                        </td>
+                                        <td>
+                                            <a href="/Image/DeleteImage/@item.ImageId" class="btn btn-danger btn-sm">Sil</a>
+                                            <a href="/Image/UpdateImage/@item.ImageId" class="btn btn-warning btn-sm">Güncelle</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <a href="/Image/CreateImage" class="btn btn-info btn-sm">+ Yeni Görsel</a>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <!-- SweetAlert2 kütüphanesini anında projeye dahil ediyoruz -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            title: 'Başarılı!',
+            text: '@Html.Raw(TempData["SuccessMessage"])',
+            icon: 'success',
+            confirmButtonText: 'Tamam',
+            timer: 2500,
+            timerProgressBar: true
+        });
+    </script>
+}

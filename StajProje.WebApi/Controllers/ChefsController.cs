@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using StajProje.WebApi.Context;
 using StajProje.WebApi.Entities;
 using System.Reflection;

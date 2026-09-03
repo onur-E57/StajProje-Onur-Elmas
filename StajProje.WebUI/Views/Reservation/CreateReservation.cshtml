@@ -1,5 +1,49 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model CreateReservationDto
+
 @{
+    ViewData["Title"] = "CreateReservation";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
 }
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Rezervasyon Ekleme Sayfası</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            <div class="form-group">
+                                <label asp-for="NameSurname">İsim Soyisim</label>
+                                <input type="text" asp-for="NameSurname" class="form-control" />
+                                <label asp-for="Email">E-Posta</label>
+                                <input type="text" asp-for="Email" class="form-control" />
+                                <label asp-for="PhoneNumber">Telefon Numarası</label>
+                                <input type="text" asp-for="PhoneNumber" placeholder="05553231242" class="form-control" />
+                                <label asp-for="ReservationDate">Tarih</label>
+                                <input type="date" asp-for="ReservationDate" class="form-control" />
+                                <label asp-for="ReservationTime">Saat</label>
+                                <input type="time" asp-for="ReservationTime" class="form-control" />
+                                <label asp-for="CountofPeople">Kişi Sayısı</label>
+                                <input type="number" asp-for="CountofPeople" class="form-control" />
+                                <label asp-for="Message">Mesaj</label>
+                                <input type="text" asp-for="Message" class="form-control" />
+                                <div class="form-group">
+                                    <label asp-for="ReservationStatus">Rezervasyon Durumu</label>
+                                    <select asp-for="ReservationStatus" class="form-control">
+                                        <option value="Beklemede">Beklemede</option>
+                                        <option value="Onaylandı">Onaylandı</option>
+                                        <option value="İptal Edildi">İptal Edildi</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Ekle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

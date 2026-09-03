@@ -1,0 +1,75 @@
+﻿@model List<ResultContactDto>
+@{
+    ViewData["Title"] = "İletişim Listesi";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+    int count = 0;
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>İletişim Listesi</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Adres</th>
+                                    <th scope="col">Numara</th>
+                                    <th scope="col">Açılış Saatleri</th>
+                                    <th scope="col">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    count++;
+                                    <tr>
+                                        <th scope="row">@count</th>
+                                        <td>@item.Address</td>
+                                        <td>@item.Phone</td>
+                                        <td>@item.OpenHours</td>
+                                        <td>
+                                            <a href="/Contact/DeleteContact/@item.ContactId" class="btn btn-danger btn-sm">Sil</a>
+                                            <a href="/Contact/UpdateContact/@item.ContactId" class="btn btn-warning btn-sm">Güncelle</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        @if (Model.Count == 1)
+                        {
+                            <a href="/Contact/CreateContact" class="btn btn-info btn-sm" onclick="return false">İletişim Bilgileri Mevcut</a>
+                        }
+                        else
+                        {
+                            <a href="/Contact/CreateContact" class="btn btn-info btn-sm">+ Yeni İletişim Bilgisi</a>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <!-- SweetAlert2 kütüphanesini anında projeye dahil ediyoruz -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            title: 'Başarılı!',
+            text: '@Html.Raw(TempData["SuccessMessage"])',
+            icon: 'success',
+            confirmButtonText: 'Tamam',
+            timer: 2500,
+            timerProgressBar: true
+        });
+    </script>
+}

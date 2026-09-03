@@ -5,6 +5,8 @@ using StajProje.WebApi.Dtos.FeatureDtos;
 using StajProje.WebApi.Dtos.MessageDtos;
 using StajProje.WebApi.Dtos.ProductDtos;
 using StajProje.WebApi.Dtos.ReservationDtos;
+using StajProje.WebApi.Dtos.ImageDtos;
+using StajProje.WebApi.Dtos.ContactDtos;
 using StajProje.WebApi.Entities;
 
 namespace StajProje.WebApi.Mapping
@@ -41,6 +43,16 @@ namespace StajProje.WebApi.Mapping
             CreateMap<About, UpdateAboutDto>().ReverseMap();
             CreateMap<About, GetByIdAboutDto>().ReverseMap();
             CreateMap<About, ResultAboutDto>().ReverseMap();
+
+            CreateMap<Image, CreateImageDto>().ReverseMap();
+            CreateMap<Image, UpdateImageDto>().ReverseMap();
+            CreateMap<Image, GetByIdImageDto>().ReverseMap();
+            CreateMap<Image, ResultImageDto>().ReverseMap();
+
+            CreateMap<Contact, CreateContactDto>().ReverseMap();
+            CreateMap<Contact, UpdateContactDto>().ReverseMap();
+            CreateMap<Contact, GetByIdContactDto>().ReverseMap();
+            CreateMap<Contact, ResultContactDto>().ReverseMap();
         }
     }
 }

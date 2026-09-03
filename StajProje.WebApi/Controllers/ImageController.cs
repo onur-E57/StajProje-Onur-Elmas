@@ -1,60 +1,60 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using StajProje.WebApi.Context;
-using StajProje.WebApi.Dtos.ContactDtos;
+using StajProje.WebApi.Dtos.ImageDtos;
 using StajProje.WebApi.Entities;
 
 namespace StajProje.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ContactsController : ControllerBase
+    public class ImagesController : ControllerBase
     {
         private readonly ApiContext _context;
         private readonly IMapper _mapper;
-        public ContactsController(ApiContext context, IMapper mapper)
+        public ImagesController(ApiContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
         [HttpGet]
-        public IActionResult ContactList()
+        public IActionResult ImageList()
         {
-            var values = _context.Contacts.ToList();
+            var values = _context.Images.ToList();
             return Ok(values);
         }
 
         [HttpPost]
-        public IActionResult CreateContact(CreateContactDto createContactDto)
+        public IActionResult CreateImage(CreateImageDto createImageDto)
         {
-            var value = _mapper.Map<Contact>(createContactDto);
-            _context.Contacts.Add(value);
+            var value = _mapper.Map<Image>(createImageDto);
+            _context.Images.Add(value);
             _context.SaveChanges();
             return Ok("Ekleme işlemi başarılı");
         }
 
         [HttpDelete]
-        public IActionResult DeleteContact(int id)
+        public IActionResult DeleteImage(int id)
         {
-            var value = _context.Contacts.Find(id);
+            var value = _context.Images.Find(id);
             if (value == null)
             {
                 return NotFound();
             }
             else
             {
-                _context.Contacts.Remove(value);
+                _context.Images.Remove(value);
                 _context.SaveChanges();
-                return Ok("İletişim silme işlemi başarılı");
+                return Ok("Görsel silme işlemi başarılı");
             }
 
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetContact(int id)
+        public IActionResult GetImage(int id)
         {
-            var value = _context.Contacts.Find(id);
+            var value = _context.Images.Find(id);
             if (value == null)
             {
                 return NotFound();
@@ -66,18 +66,18 @@ namespace StajProje.WebApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateContact(UpdateContactDto updateContactDto)
+        public IActionResult UpdateImage(UpdateImageDto updateImageDto)
         {
-            var value = _context.Contacts.Find(updateContactDto.ContactId);
+            var value = _context.Images.Find(updateImageDto.ImageId);
             if (value == null)
             {
                 return NotFound();
             }
             else
             {
-                _mapper.Map(updateContactDto, value);
+                _mapper.Map(updateImageDto, value);
                 _context.SaveChanges();
-                return Ok("İletişim güncelleme işlemi başarılı");
+                return Ok("Görsel güncelleme işlemi başarılı");
             }
         }
     }

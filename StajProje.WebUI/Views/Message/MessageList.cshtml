@@ -1,0 +1,97 @@
+﻿@model List<ResultMessageDto>
+@{
+    ViewData["Title"] = "Mesaj Listesi";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+    int count = 0;
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Mesaj Listesi</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">İsim Soyisim</th>
+                                    <th scope="col">Konu</th>
+                                    <th scope="col">Açıklama</th>
+                                    <th scope="col">Tarih</th>
+                                    <th scope="col">Durum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    count++;
+                                    <tr>
+                                        <th scope="row">@count</th>
+                                        <td>@item.NameSurname</td>
+                                        <td>@item.Subject</td>
+                                        <td>
+                                            @(item.MessageDetails != null && item.MessageDetails.Length > 30
+                                                ? item.MessageDetails.Substring(0, 30) + "..."
+                                                : item.MessageDetails)
+                                        </td>
+                                        <td>@item.SendDate.ToString("dd.MM.yyyy")</td>
+                                        <td>@item.IsRead</td>
+                                        <td>
+                                            <a href="#" class="btn btn-info btn-sm text-white" 
+                                               onclick="openMessageModal('@item.NameSurname', '@item.Subject', '@Html.Raw(item.MessageDetails.Replace("'", "\\'"))')">
+                                               Mesajı Oku
+                                            </a>
+                                            <a href="/Message/DeleteMessage/@item.MessageId" class="btn btn-danger btn-sm">Sil</a>
+                                            <a href="/Message/UpdateMessage/@item.MessageId" class="btn btn-warning btn-sm">Güncelle</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <!-- SweetAlert2 kütüphanesini anında projeye dahil ediyoruz -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            title: 'Başarılı!',
+            text: '@Html.Raw(TempData["SuccessMessage"])',
+            icon: 'success',
+            confirmButtonText: 'Tamam',
+            timer: 2500,
+            timerProgressBar: true
+        });
+    </script>
+}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function openMessageModal(name, subject, details) {
+        Swal.fire({
+            title: `<span style="font-size: 20px; color: #333;">${subject}</span>`,
+            html: `
+                <div style="text-align: left; padding: 10px;">
+                    <p style="margin-bottom: 8px;"><strong>Gönderen:</strong> <span style="color: #555;">${name}</span></p>
+                    <hr style="margin: 5px 0 15px 0;">
+                    <p style="color: #444; line-height: 1.6; font-size: 15px; background: #f8f9fa; padding: 12px; border-radius: 8px;">${details}</p>
+                </div>
+            `,
+            icon: 'info',
+            confirmButtonText: 'Kapat',
+            confirmButtonColor: '#3085d6',
+            width: '600px'
+        });
+    }
+</script>

@@ -1,0 +1,34 @@
+﻿@model GetByIdImageDto
+
+@{
+    ViewData["Title"] = "UpdateImage";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Görsel Güncelleme Sayfası</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            <input type="hidden" asp-for="ImageId" />
+                            <div class="form-group">
+                                <label asp-for="Title">Görsel Adı</label>
+                                <input type="text" asp-for="Title" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ImageUrl">Görsel URL</label>
+                                <textarea asp-for="ImageUrl" rows="5" class="form-control"></textarea>
+                            </div>
+                            <button class="btn btn-success">Güncelle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

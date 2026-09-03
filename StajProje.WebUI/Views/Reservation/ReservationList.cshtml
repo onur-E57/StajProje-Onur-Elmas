@@ -1,5 +1,89 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model List<ResultReservationDto>
 @{
+    ViewData["Title"] = "Rezervasyon Listesi";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+    int count = 0;
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Rezervasyon Listesi</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">İsim Soyisim</th>
+                                    <th scope="col">Tarih</th>
+                                    <th scope="col">Saat</th>
+                                    <th scope="col">Kişi Sayısı</th>
+                                    <th scope="col">Durum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    count++;
+                                    <tr>
+                                        <th scope="row">@count</th>
+                                        <td>@item.NameSurname</td>
+                                        <td>@item.ReservationDate.ToString("dd.MM.yyyy")</td>
+                                        <td>@item.ReservationTime</td>
+                                        <td>@item.CountofPeople</td>
+                                        <td>
+                                            @if (item.ReservationStatus == "Onaylandı")
+                                            {
+                                                <span style="color: green; font-weight: 600;">Onaylandı</span>
+                                            }
+                                            else if (item.ReservationStatus == "Beklemede")
+                                            {
+                                                <span style="color: #ffc107; font-weight: 600;">Beklemede</span>
+                                            }
+                                            else if (item.ReservationStatus == "İptal Edildi")
+                                            {
+                                                <span style="color: red; font-weight: 600;">İptal Edildi</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@item.ReservationStatus</span>
+                                            }
+                                        </td>
+
+
+                                        <td>
+                                            <a href="/Reservation/DeleteReservation/@item.ReservationId" class="btn btn-danger btn-sm">Sil</a>
+                                            <a href="/Reservation/UpdateReservation/@item.ReservationId" class="btn btn-warning btn-sm">Güncelle</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <a href="/Reservation/CreateReservation" class="btn btn-info btn-sm">+ Yeni Rezervasyon</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <!-- SweetAlert2 kütüphanesini anında projeye dahil ediyoruz -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            title: 'Başarılı!',
+            text: '@Html.Raw(TempData["SuccessMessage"])',
+            icon: 'success',
+            confirmButtonText: 'Tamam',
+            timer: 2500,
+            timerProgressBar: true
+        });
+    </script>
 }
