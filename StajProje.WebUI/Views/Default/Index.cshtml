@@ -6,6 +6,7 @@
 <html lang="tr">
 
 @await Component.InvokeAsync("_HeadDefaultComponentPartial")
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.all.min.js"></script>
 
 <body class="index-page">
 
@@ -92,9 +93,6 @@
     </main>
 
     @await Component.InvokeAsync("_FooterDefaultComponentPartial")
-
-    <!-- SweetAlert2 kütüphanesi yüklü değilse -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
             function openAiChefModal() {

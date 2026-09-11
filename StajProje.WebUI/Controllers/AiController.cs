@@ -1,9 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace StajProje.WebUI.Controllers
 {
     public class AIController : Controller
     {
+        private readonly IConfiguration _configuration;
+        public AIController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public IActionResult CreateRecipeWithGemini()
         {
             return View();
@@ -12,7 +18,7 @@ namespace StajProje.WebUI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRecipeWithGemini([FromBody] PromptDto dto)
         {
-            var apiKey = "AIzaSyBnA-CH31Z09RmnNZp6koi2UBjWCeVuOFA";
+            var apiKey = _configuration["GeminiConfig:ApiKey"];
             using var client = new HttpClient();
 
             var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={apiKey}";
