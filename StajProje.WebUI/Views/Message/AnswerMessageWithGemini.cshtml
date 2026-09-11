@@ -1,0 +1,53 @@
+﻿@model GetByIdMessageDto
+@{
+    ViewData["Title"] = "Yapay Zeka ile Cevap";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Yapay Zeka ile Cevap</h4>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="AnswerMessageWithGemini" method="post">
+                            <input type="hidden" asp-for="MessageId" />
+                            <input type="hidden" asp-for="Email" />
+                            <input type="hidden" asp-for="Subject" />
+
+                            <div class="form-group">
+                                <label>Gelen Mesaj</label>
+                                <textarea asp-for="MessageDetails" class="form-control" style="height: 150px !important;" readonly></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Yapay Zeka Cevap Taslağı (Düzenleyebilirsiniz)</label>
+                                <textarea name="aiAnswerText" class="form-control" style="height: 250px !important;">@ViewBag.AiAnswer</textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">Müşteriye E-Posta Gönder</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            title: 'Başarılı!',
+            text: '@Html.Raw(TempData["SuccessMessage"])',
+            icon: 'success',
+            confirmButtonText: 'Tamam',
+            timer: 2500,
+            timerProgressBar: true
+        });
+    </script>
+}

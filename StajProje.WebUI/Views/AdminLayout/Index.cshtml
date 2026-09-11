@@ -4,9 +4,26 @@
 
 <!DOCTYPE html>
 <html lang="en">
+<style>
+    /* Sidebar içeriği ekrana sığmazsa aşağı kaydırmayı aktif et */
+    .main-sidebar {
+        overflow-y: auto !important;
+        scrollbar-width: thin; /* Firefox için ince scrollbar */
+    }
+
+        /* Chrome/Edge/Safari için scrollbar tasarımı (temanın estetiğini bozmasın diye) */
+        .main-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .main-sidebar::-webkit-scrollbar-thumb {
+            background-color: #c1c1c1;
+            border-radius: 10px;
+        }
+</style>
 
 @await Component.InvokeAsync("_HeadAdminLayoutComponentPartial")
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.all.min.js"></script>
 <body>
     <div class="loader"></div>
     <div id="app">
