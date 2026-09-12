@@ -23,19 +23,26 @@ namespace StajProje.WebUI.Controllers
 
             var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={apiKey}";
 
+            // 1. Müşteri (UI) Tarafı İçin Yapay Zeka Kısıtlamaları (Guardrails)
+            string systemPrompt = @"Sen Yummy Restoran'ın profesyonel yapay zeka şefisin. SADECE mutfak, yemek tarifleri, malzemeler, pişirme teknikleri ve restoranımız hakkında konuşabilirsin. 
+            KESİN KURALLAR:
+            1. Kullanıcı sana yazılım (C#, AutoMapper, React vb.), teknoloji, siyaset, tarih, matematik veya mutfak dışı herhangi bir konu sorarsa KESİNLİKLE cevap verme.
+            2. Mutfak dışı konularda rol yapmaya veya soruyu yemeğe bağlamaya çalışma.
+            3. Böyle bir durumda sadece şunu söyle: 'Ben sadece mutfaktan sorumlu bir aşçıyım kanka, kodlardan veya o dediklerinden hiç anlamam! Bana dolabındaki malzemeleri söyle, sana harika bir yemek yapayım.'";
+
             var requestData = new
             {
                 contents = new[]
                 {
-            new
-            {
-                parts = new[]
-                {
-                    new { text = "Sen Yummy Restoran'ın profesyonel yapay zeka şefisin. Kullanıcının elindeki malzemelere göre iştah kabartan, samimi ve pratik bir yemek tarifi öner." },
-                    new { text = dto.Prompt }
+                    new
+                    {
+                        parts = new[]
+                        {
+                            new { text = systemPrompt },
+                            new { text = dto.Prompt } // DTO'dan gelen veri, altı kızarmaz.
+                        }
+                    }
                 }
-            }
-        }
             };
 
             var response = await client.PostAsJsonAsync(url, requestData);
@@ -58,19 +65,26 @@ namespace StajProje.WebUI.Controllers
 
             var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={apiKey}";
 
+            // 2. Admin Paneli İçin Yapay Zeka Kısıtlamaları (Guardrails)
+            string systemPrompt = @"Sen Yummy Restoran'ın profesyonel yapay zeka şefisin. SADECE mutfak, yemek tarifleri, malzemeler, pişirme teknikleri ve restoranımız hakkında konuşabilirsin. 
+            KESİN KURALLAR:
+            1. Kullanıcı sana yazılım (C#, AutoMapper, React vb.), teknoloji, siyaset, tarih, matematik veya mutfak dışı herhangi bir konu sorarsa KESİNLİKLE cevap verme.
+            2. Mutfak dışı konularda rol yapmaya veya soruyu yemeğe bağlamaya çalışma.
+            3. Böyle bir durumda sadece şunu söyle: 'Ben sadece mutfaktan sorumlu bir aşçıyım kanka, kodlardan veya o dediklerinden hiç anlamam! Bana dolabındaki malzemeleri söyle, sana harika bir yemek yapayım.'";
+
             var requestData = new
             {
                 contents = new[]
                 {
-            new
-            {
-                parts = new[]
-                {
-                    new { text = "Sen Yummy Restoran'ın profesyonel yapay zeka şefisin. Kullanıcının elindeki malzemelere göre iştah kabartan, samimi ve pratik bir yemek tarifi öner." },
-                    new { text = prompt } // DTO yerine direkt string prompt alıyoruz
+                    new
+                    {
+                        parts = new[]
+                        {
+                            new { text = systemPrompt },
+                            new { text = prompt }
+                        }
+                    }
                 }
-            }
-        }
             };
 
             var response = await client.PostAsJsonAsync(url, requestData);
@@ -78,7 +92,6 @@ namespace StajProje.WebUI.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<GeminiResponse>();
-                // JSON dönmek yerine View (HTML) sayfasına veri taşıyoruz
                 ViewBag.recipe = result?.candidates?[0]?.content?.parts?[0]?.text;
             }
             else
@@ -86,7 +99,6 @@ namespace StajProje.WebUI.Controllers
                 ViewBag.recipe = "Şef şu anda meşgul, lütfen biraz sonra tekrar deneyin.";
             }
 
-            // Aynı form sayfasına geri dönüp ViewBag ile sonucu ekrana basıyoruz
             return View("CreateRecipeWithGemini");
         }
 

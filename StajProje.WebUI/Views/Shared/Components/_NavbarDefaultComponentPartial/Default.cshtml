@@ -1,4 +1,19 @@
-﻿<header id="header" class="header d-flex align-items-center sticky-top">
+﻿<style>
+    /* Menüdeki alt çizgi efektini sadece AI Şef butonu için iptal eder */
+    #navmenu ul li a.btn-book-a-table::after,
+    #navmenu ul li a.btn-book-a-table::before {
+        display: none !important;
+        content: none !important;
+    }
+
+    /* Hover durumunda butonun renginin temanın kırmızı rengine dönmesini engeller */
+    #navmenu ul li a.btn-book-a-table:hover {
+        color: #fff !important;
+        transform: translateY(-2px); /* Tıklanma hissi için ufak bir animasyon */
+    }
+</style>
+
+<header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container position-relative d-flex align-items-center justify-content-between">
 
         <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
@@ -16,16 +31,16 @@
                 <li><a href="#events">Etkinlikler</a></li>
                 <li><a href="#chefs">Şefler</a></li>
                 <li><a href="#gallery">Galeri</a></li>
-                
                 <li><a href="#contact">İletişim</a></li>
+                <li>
+                    <a href="javascript:void(0);" onclick="openAiChefModal()" class="btn-book-a-table ms-3 d-inline-flex align-items-center justify-content-center" style="color: #fff !important; text-decoration: none; padding: 8px 25px; border-radius: 50px; background: linear-gradient(135deg, #7a97ff 0%, #9177c7 50%, #ec7cc3 100%); font-weight: 500; font-size: 14px; box-shadow: 0 4px 12px rgba(145, 119, 199, 0.35); transition: 0.3s;">
+                        <i class="bi bi-stars me-2" style="font-size: 15px; color: #fff;"></i> AI Şef
+                    </a>
+                </li>
             </ul>
             <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
 
         <a class="btn-getstarted" href="#book-a-table">Rezervasyon Yapın</a>
-        <a href="javascript:void(0);" onclick="openAiChefModal()" class="btn-book-a-table ms-3 d-inline-flex align-items-center justify-content-center" style="color: #fff !important; text-decoration: none; padding: 8px 25px; border-radius: 50px; background: linear-gradient(135deg, #7a97ff 0%, #9177c7 50%, #ec7cc3 100%); font-weight: 500; font-size: 14px; box-shadow: 0 4px 12px rgba(145, 119, 199, 0.35); transition: 0.3s;">
-            <i class="bi bi-stars me-2" style="font-size: 15px; color: #fff;"></i> AI Şef
-        </a>
-
     </div>
 </header>

@@ -89,3 +89,21 @@
         </div>
     </div>
 </section>
+
+<!-- Rezervasyon Başarılı Pop-up Kontrolü -->
+@if (TempData["MessageSuccess"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            Swal.fire({
+                title: 'Mesaj Gönderildi!',
+                text: '@Html.Raw(TempData["MessageSuccess"])',
+                icon: 'success',
+                confirmButtonText: 'Harika',
+                confirmButtonColor: '#ce1212',
+                timer: 2500,
+                timerProgressBar: true
+            });
+        });
+    </script>
+}
