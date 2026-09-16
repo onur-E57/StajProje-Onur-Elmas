@@ -59,51 +59,6 @@
                     </div>
                 </div>
             </div><!-- End Info Item -->
-
-            <form asp-controller="Default" asp-action="SendMessage" method="post" class="mt-4 p-4 border rounded shadow-sm bg-white">
-                <div class="row gy-4">
-
-                    <div class="col-md-6">
-                        <input type="text" name="NameSurname" class="form-control" placeholder="İsminiz" required="">
-                    </div>
-
-                    <div class="col-md-6 ">
-                        <input type="email" class="form-control" name="Email" placeholder="E-Posta Adresiniz" required="">
-                    </div>
-
-                    <div class="col-md-12">
-                        <input type="text" class="form-control" name="Subject" placeholder="Konu" required="">
-                    </div>
-
-                    <div class="col-md-12">
-                        <textarea class="form-control" name="MessageDetails" rows="6" placeholder="Mesaj" required=""></textarea>
-                    </div>
-
-                    <div class="col-md-12 text-center mt-3">
-                        <button type="submit" class="btn btn-danger rounded-pill px-5 py-2">Mesajı Gönder</button>
-                    </div>
-
-                </div>
-            </form>
-
         </div>
     </div>
 </section>
-
-<!-- Rezervasyon Başarılı Pop-up Kontrolü -->
-@if (TempData["MessageSuccess"] != null)
-{
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            Swal.fire({
-                title: 'Mesaj Gönderildi!',
-                text: '@Html.Raw(TempData["MessageSuccess"])',
-                icon: 'success',
-                confirmButtonText: 'Harika',
-                confirmButtonColor: '#ce1212',
-                timer: 2500,
-                timerProgressBar: true
-            });
-        });
-    </script>
-}

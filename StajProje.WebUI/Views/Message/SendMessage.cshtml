@@ -1,0 +1,50 @@
+﻿@model CreateMessageDto
+
+<!-- 1. Temanın beyaz arka planını ve o yumuşak gölgesini (box-shadow) doğrudan forma yapıştırdık -->
+<form asp-controller="Message" asp-action="SendMessage" method="post" style="background-color: #fff; box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1); padding: 30px; border-radius: 10px;">
+    <div class="row gy-4">
+
+        <div class="col-md-6">
+            <!-- py-2 class'ı ile inputların iç boşluklarını biraz genişlettik ki ferah dursun -->
+            <input type="text" name="NameSurname" class="form-control py-2" placeholder="İsminiz" required="">
+        </div>
+
+        <div class="col-md-6">
+            <input type="email" class="form-control py-2" name="Email" placeholder="E-Posta Adresiniz" required="">
+        </div>
+
+        <div class="col-md-12">
+            <input type="text" class="form-control py-2" name="Subject" placeholder="Konu" required="">
+        </div>
+
+        <div class="col-md-12">
+            <textarea class="form-control py-2" name="MessageDetails" rows="6" placeholder="Mesaj" required=""></textarea>
+        </div>
+
+        <div class="col-md-12 text-center mt-3">
+            <!-- 2. Temanın o güzel kırmızı rengini (#ce1212) ve yuvarlak buton yapısını (rounded-pill) Bootstrap ile harmanladık -->
+            <button type="submit" class="btn rounded-pill px-5 py-2" style="background-color: #ce1212; color: #fff; font-weight: 500; border: none; transition: 0.3s;">
+                Mesajı Gönder
+            </button>
+        </div>
+
+    </div>
+</form>
+
+<!-- Mesaj Gönderme Başarılı Pop-up Kontrolü -->
+@if (TempData["MessageSuccess"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            Swal.fire({
+                title: 'Mesaj Gönderildi!',
+                text: '@Html.Raw(TempData["MessageSuccess"])',
+                icon: 'success',
+                confirmButtonText: 'Harika',
+                confirmButtonColor: '#ce1212',
+                timer: 2500,
+                timerProgressBar: true
+            });
+        });
+    </script>
+}

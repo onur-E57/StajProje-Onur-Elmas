@@ -26,7 +26,7 @@ namespace StajProje.WebUI.Controllers
             return View();
         }
 
-        // İŞTE FORMUN YAKALANDIĞI YER BURASI
+        /* İŞTE FORMUN YAKALANDIĞI YER BURASI
         [HttpPost]
         public async Task<IActionResult> SendMessage(CreateMessageDto createMessageDto)
         {
@@ -88,7 +88,7 @@ namespace StajProje.WebUI.Controllers
 
             return RedirectToAction("Index", "Default");
         }
-
+        */
         [HttpPost]
         public async Task<IActionResult> BookTable(CreateReservationDto createReservationDto)
         {

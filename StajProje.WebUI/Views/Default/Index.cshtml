@@ -90,6 +90,7 @@
         <!-- Contact Section -->
         @await Component.InvokeAsync("_ContactDefaultComponentPartial")
         <!-- /Contact Section -->
+        @await Html.PartialAsync("~/Views/Message/SendMessage.cshtml")
     </main>
 
     @await Component.InvokeAsync("_FooterDefaultComponentPartial")
