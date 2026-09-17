@@ -7,17 +7,17 @@
 <div class="container mt-4">
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Yummy Canlı Destek Asistanı</h5>
+            <h5 class="mb-0">Yummy Yönetici Asistanı</h5> 
         </div>
         <div class="card-body">
             <div id="chat" style="border:1px solid #ddd; border-radius:8px; padding:15px; min-height:400px; max-height:400px; overflow-y:auto; white-space:pre-wrap; background-color:#fafafa;"></div>
 
             <div id="typing" style="opacity:.6; font-style:italic; margin-top:10px; display:none; color:#555;">
-                Yummy Asistan yazıyor...
+                Yönetici Asistanı yazıyor... 
             </div>
 
             <div style="display:flex; gap:10px; margin-top:15px;">
-                <input id="messageInput" class="form-control" type="text" placeholder="Mesajınızı buraya yazın..." />
+                <input id="messageInput" class="form-control" type="text" placeholder="Örn: 6 kişilik rezervasyon için bir onay maili taslağı hazırla..." />
                 <button id="sendBtn" class="btn btn-warning px-4 fw-bold">Gönder</button>
             </div>
         </div>
@@ -25,6 +25,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
+
 <script>
     const chat = document.getElementById('chat');
     const typing = document.getElementById('typing');
@@ -38,11 +39,11 @@
         .withAutomaticReconnect()
         .build();
 
-    // 1. Müşterinin kendi yazdığı mesaj
+    // 1. Senin (Adminin) yazdığı mesaj
     conn.on("ReceiveUserEcho", (text) => {
         const div = document.createElement('div');
         div.style.margin = '10px 0';
-        div.style.textAlign = 'right'; // Kullanıcı mesajını sağa yasladık
+        div.style.textAlign = 'right'; 
         div.innerHTML = `<span style="background-color:#007bff; color:white; padding:8px 15px; border-radius:15px 15px 0 15px; display:inline-block;">${text}</span>`;
         chat.appendChild(div);
         chat.scrollTop = chat.scrollHeight;
@@ -57,12 +58,11 @@
             bufEl.style.margin = '10px 0';
             bufEl.style.textAlign = 'left';
 
-            // Asistanın adını belirttik ve güvenli TextNode yapısına geçtik
-            bufEl.innerHTML = `<span style="background-color:#e9ecef; color:#333; padding:8px 15px; border-radius:15px 15px 15px 0; display:inline-block;"><strong>Yummy Asistan: </strong><span class="ai-text"></span></span>`;
+            // ASİSTANIN ADI GÜNCELLENDİ
+            bufEl.innerHTML = `<span style="background-color:#e9ecef; color:#333; padding:8px 15px; border-radius:15px 15px 15px 0; display:inline-block;"><strong>Yönetici Asistanı: </strong><span class="ai-text"></span></span>`;
             chat.appendChild(bufEl);
         }
 
-        // Gelen harfleri güvenli bir şekilde ekliyoruz
         const textContainer = bufEl.querySelector('.ai-text');
         textContainer.appendChild(document.createTextNode(token));
 
@@ -72,7 +72,7 @@
     // 3. Mesajın tamamlanması
     conn.on("CompleteMessage", (_full) => {
         typing.style.display = 'none';
-        bufEl = null; // Bir sonraki mesaj için buffer'ı sıfırla
+        bufEl = null; 
         chat.scrollTop = chat.scrollHeight;
     });
 
@@ -96,8 +96,8 @@
         bufEl = null;
         typing.style.display = 'block';
 
-        // Backend'deki C# SendMessage metodunu tetikliyoruz
-        await conn.invoke("SendMessage", text);
+        // --- EN KRİTİK DEĞİŞİKLİK: "admin" ETİKETİNİ EKLİYORUZ ---
+        await conn.invoke("SendMessage", text, "admin");
     }
 
     sendBtn.addEventListener('click', send);

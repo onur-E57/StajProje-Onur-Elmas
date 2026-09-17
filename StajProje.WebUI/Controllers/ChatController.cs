@@ -8,5 +8,10 @@ namespace StajProje.WebUI.Controllers
         {
             return View();
         }
+
+        public PartialViewResult ChatbotPartial()
+        {
+            return PartialView();
+        }
     }
 }

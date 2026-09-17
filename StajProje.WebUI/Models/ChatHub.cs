@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System;
+using StajProje.WebUI.Dtos.ReservationDtos; // DTO'yu buraya using olarak ekliyoruz
 
 namespace StajProje.WebUI.Models
 {
@@ -18,6 +19,7 @@ namespace StajProje.WebUI.Models
         private readonly IConfiguration _configuration;
         private readonly string _apiKey;
         private readonly IHttpClientFactory _httpClientFactory;
+        private static readonly Dictionary<string, List<GeminiContent>> _history = new();
 
         public ChatHub(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
@@ -26,14 +28,18 @@ namespace StajProje.WebUI.Models
             _httpClientFactory = httpClientFactory;
         }
 
-        private static readonly Dictionary<string, List<GeminiContent>> _history = new();
+        private const string AdminSystemInstruction = @"Sen Yummy Restoran'ın 'Yönetici ve Sistem Asistanısın'. Görevin yöneticiye yardım etmektir.";
+        private const string CustomerSystemInstruction = @"Sen Yummy Restoran'ın canlı destek asistanısın. Müşterilere menü ve rezervasyon konusunda yardımcı ol. 
 
-        // Temel rolümüz
-        private const string BaseSystemInstruction = @"Sen Yummy Restoran'ın profesyonel yapay zeka asistanısın. Müşterilere kibar ve net cevaplar ver. 
-                                                    KESİN KURALLAR: 
-                                                                    1. Kullanıcı sana yazılım (C#, AutoMapper, React vb.), teknoloji, siyaset, tarih, matematik veya restoran dışı herhangi bir konu sorarsa KESİNLİKLE cevap verme. 
-                                                                    2. Mutfak dışı konularda rol yapmaya veya soruyu yemeğe bağlamaya çalışma. 
-                                                                    3. Böyle bir durumda sadece şunu söyle: 'Ben sadece canlı destek asistanıyım, kodlardan veya o dediklerinden hiç anlamam! Restoranımızla ilgili bilgileri sana verebilirim.'";
+KESİN KURAL: Sana aşağıda verilecek olan 'VERİTABANINDAKİ GÜNCEL VE ONAYLI MENÜ' listesi dışındakileri ASLA söyleme, dışarıdan asla ürün/fiyat uydurma! Sadece veritabanında olanları söyle.
+
+EĞER MÜŞTERİ REZERVASYON YAPMAK İSTERSE: Ad Soyad, E-posta (yoksa 'belirtilmedi@gmail.com'), Telefon Numarası, Tarih (DD-MM-YYYY formatında), Saat (HH:MM) ve Kişi Sayısı bilgilerini iste.
+
+REZERVASYON ONAY AŞAMASI (ÇOK ÖNEMLİ):
+Tüm bilgileri topladığında HEMEN işlemi tamamlama! Önce müşteriye bilgilerin bir özetini sun ve açıkça 'Bu bilgileri onaylıyor musunuz?' diye sor. Kullanıcı açıkça 'Evet', 'Onaylıyorum' veya 'Tamamdır' gibi bir onay vermeden ASLA kaydetme komutu gönderme. Müşteri değişiklik yapmak isterse bilgileri güncelle ve tekrar onay iste.
+
+MÜŞTERİ KESİN ONAY VERDİKTEN SONRA:
+Sadece ve sadece müşteri onay verdikten sonra, yanıtının en sonuna KESİNLİKLE şu formatı ekle: ||SAVE:AdSoyad|Eposta|Telefon|Tarih|Saat|KisiSayisi|| (Örn: ||SAVE:Onur Elmas|onur@gmail.com|05554443322|20-09-2026|20:00|2||) ve ardından rezervasyonun alındığına dair güzel bir onay mesajı yaz.";
 
         public override Task OnConnectedAsync()
         {
@@ -47,8 +53,8 @@ namespace StajProje.WebUI.Models
             return base.OnDisconnectedAsync(exception);
         }
 
-        //DB'den RAG verisini çekip Gemini'ye fısıldayacak metot
-        private async Task<string> GetMenuDataFromDatabaseAsync()
+        // --- 2. RAG MİMARİSİ: Veritabanından Kategorili Menüyü Çeken Metot ---
+        private async Task<string> GetMenuDataFromDatabaseAsync(string role)
         {
             try
             {
@@ -82,32 +88,38 @@ namespace StajProje.WebUI.Models
 
                         foreach (var group in groupedProducts)
                         {
-                            // Kategori adını Categories listesinden buluyoruz
                             var categoryName = categories.FirstOrDefault(c => c.CategoryId == group.Key)?.CategoryName ?? "Diğer Lezzetlerimiz";
-
                             menuBuilder.AppendLine($"\n[{categoryName.ToUpper()}] KATEGORİSİ:");
 
                             foreach (var item in group)
                             {
-                                // Hem ürün adını, hem içeriğini, hem fiyatını veriyoruz
                                 menuBuilder.AppendLine($"- {item.ProductName} (İçindekiler: {item.ProductDescription}) : {item.ProductPrice} TL");
                             }
                         }
+                        
+                        // 4. Role Göre Kuralları Ekliyoruz
+                        if (role == "admin")
+                        {
+                            menuBuilder.AppendLine("\nSİSTEM BİLGİSİ: Restoranın güncel menü veritabanı ve içerikleri yukarıdaki gibidir. Yönetici senden menüyle ilgili bir kampanya veya mail taslağı hazırlamanı isterse bu gerçek verileri kullan.");
+                        }
+                        else // customer (müşteri)
+                        {
+                            menuBuilder.AppendLine("\nÖNEMLİ KURAL: Müşteriye ürün önerirken SADECE YUKARIDAKİ GERÇEK MENÜYÜ kullan. Müşteri içerik veya alerjen sorarsa parantez içindeki 'İçindekiler' bilgisini baz al. Olmayan bir ürünü satmaya çalışma.");
+                        }
 
-                        menuBuilder.AppendLine("\nÖNEMLİ KURAL: Müşteriye ürün önerirken SADECE YUKARIDAKİ GERÇEK MENÜYÜ kullan. Müşteri içerik veya alerjen sorarsa parantez içindeki 'İçindekiler' bilgisini baz al.");
                         return menuBuilder.ToString();
                     }
                 }
             }
             catch
             {
-                // Hata olursa sessizce geç
+                // API'ye ulaşılamazsa sessizce hatayı yut, hata patlatma
             }
 
             return "Şu an güncel menü veritabanından çekilemedi.";
         }
 
-        public async Task SendMessage(string userMessage)
+        public async Task SendMessage(string userMessage, string role = "customer")
         {
             await Clients.Caller.SendAsync("ReceiveUserEcho", userMessage);
             var history = _history[Context.ConnectionId];
@@ -118,89 +130,144 @@ namespace StajProje.WebUI.Models
                 Parts = new List<GeminiPart> { new GeminiPart { Text = userMessage } }
             });
 
-            await StreamGemini(history, Context.ConnectionAborted);
+            await StreamGemini(history, role, Context.ConnectionAborted);
         }
 
-        public async Task StreamGemini(List<GeminiContent> history, CancellationToken cancellationToken)
+        public async Task StreamGemini(List<GeminiContent> history, string role, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(_apiKey))
+            try
             {
-                await Clients.Caller.SendAsync("ReceiveToken", "⚠️ Sistem Hatası: API Anahtarı bulunamadı.", cancellationToken);
-                await Clients.Caller.SendAsync("CompleteMessage", "", cancellationToken);
-                return;
-            }
+                string baseInstruction = role == "admin" ? AdminSystemInstruction : CustomerSystemInstruction;
 
-            // 1. Veritabanından RAG verisini çek
-            string menuContext = await GetMenuDataFromDatabaseAsync();
-
-            // 2. Base Instruction ile RAG Verisini birleştirip Gemini'ye fısılda
-            string dynamicSystemInstruction = $"{BaseSystemInstruction}\n\n{menuContext}";
-
-            var client = _httpClientFactory.CreateClient();
-            var url = $"https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash-lite:streamGenerateContent?alt=sse&key={_apiKey}";
-
-            var payload = new
-            {
-                system_instruction = new
+                // Müşteri asistanına özel dinamik veri formatı kuralını ekliyoruz
+                if (role == "customer")
                 {
-                    parts = new { text = dynamicSystemInstruction } // Dinamik RAG kuralımızı buraya gömdük
-                },
-                contents = history,
-                generationConfig = new { temperature = 0.2 }
-            };
-
-            using var req = new HttpRequestMessage(HttpMethod.Post, url);
-            req.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-
-            using var resp = await client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-
-            if (!resp.IsSuccessStatusCode)
-            {
-                await Clients.Caller.SendAsync("ReceiveToken", $"⚠️ Google API Hatası ({resp.StatusCode})", cancellationToken);
-                await Clients.Caller.SendAsync("CompleteMessage", "", cancellationToken);
-                return;
-            }
-
-            using var stream = await resp.Content.ReadAsStreamAsync(cancellationToken);
-            using var reader = new StreamReader(stream);
-            var sb = new StringBuilder();
-
-            while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested)
-            {
-                var line = await reader.ReadLineAsync();
-                if (string.IsNullOrWhiteSpace(line)) continue;
-                if (!line.StartsWith("data: ")) continue;
-
-                var data = line.Substring(6).Trim();
-                try
-                {
-                    var chunk = JsonSerializer.Deserialize<GeminiStreamChunk>(data);
-                    var delta = chunk?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text;
-
-                    if (!string.IsNullOrEmpty(delta))
-                    {
-                        sb.Append(delta);
-                        await Clients.Caller.SendAsync("ReceiveToken", delta, cancellationToken);
-                    }
+                    baseInstruction += "\n\nKRİTİK KURAL: Müşteri Ad Soyad, E-posta, Telefon Numarası, Tarih (dd-MM-yyyy), Saat ve Kişi Sayısı bilgilerinin HEPSİNİ verdiğinde, yanıtının en sonuna KESİNLİKLE şu gizli formatı ekle: ||SAVE:AdSoyad|Eposta|Telefon|Tarih|Saat|KisiSayisi|| ve ardından nazik bir onay mesajı yaz.";
                 }
-                catch { }
+
+                string menuContext = await GetMenuDataFromDatabaseAsync(role);
+                string currentRealDate = DateTime.Now.ToString("dd-MM-yyyy");
+                string dynamicSystemInstruction = $"{baseInstruction}\n\n" +
+                                  $"GÜNCEL GERÇEK TARİH: {currentRealDate} (Bugünden önceki veya 2023 gibi geçmiş yılları ASLA kullanma, rezervasyonları veya tarihleri her zaman 2026 ve sonrasına ayarla!)\n\n" +
+                                  $"{menuContext}";
+
+                var client = _httpClientFactory.CreateClient();
+                var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:streamGenerateContent?alt=sse&key={_apiKey}";
+
+                var payload = new
+                {
+                    system_instruction = new { parts = new { text = dynamicSystemInstruction } },
+                    contents = history,
+                    generationConfig = new { temperature = 0.3 }
+                };
+
+                var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+                using var req = new HttpRequestMessage(HttpMethod.Post, url);
+                req.Content = new StringContent(JsonSerializer.Serialize(payload, serializeOptions), Encoding.UTF8, "application/json");
+
+                using var resp = await client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                using var stream = await resp.Content.ReadAsStreamAsync(cancellationToken);
+                using var reader = new StreamReader(stream);
+                var sb = new StringBuilder();
+
+                while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested)
+                {
+                    var line = await reader.ReadLineAsync();
+                    if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("data: ")) continue;
+
+                    var data = line.Substring(6).Trim();
+                    try
+                    {
+                        var chunk = JsonSerializer.Deserialize<GeminiStreamChunk>(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        var part = chunk?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault();
+
+                        if (part != null && !string.IsNullOrEmpty(part.Text))
+                        {
+                            sb.Append(part.Text);
+                        }
+                    }
+                    catch { }
+                }
+
+                string fullResponse = sb.ToString();
+
+                // 🔍 GİZLİ ETİKETİ YAKALAMA VE VERİTABANINA KAYDETME
+                if (fullResponse.Contains("||SAVE:"))
+                {
+                    try
+                    {
+                        int startIndex = fullResponse.IndexOf("||SAVE:");
+                        int endIndex = fullResponse.IndexOf("||", startIndex + 7);
+                        if (startIndex != -1 && endIndex != -1)
+                        {
+                            string saveBlock = fullResponse.Substring(startIndex, endIndex - startIndex + 2);
+                            string dataContent = saveBlock.Replace("||SAVE:", "").Replace("||", "");
+                            string[] p = dataContent.Split('|');
+
+                            if (p.Length >= 6)
+                            {
+                                var newReservation = new CreateReservationDto
+                                {
+                                    NameSurname = p[0].Trim(),
+                                    Email = p[1].Trim(),
+                                    PhoneNumber = string.IsNullOrEmpty(p[2].Trim()) ? "05000000000" : p[2].Trim(),
+                                    ReservationDate = DateTime.Parse(p[3].Trim()),
+                                    ReservationTime = p[4].Trim(),
+                                    CountofPeople = int.Parse(p[5].Trim()),
+                                    Message = "Yapay Zeka Canlı Destek Üzerinden Alındı",
+                                    ReservationStatus = "Onaylandı"
+                                };
+
+                                var apiReqContent = new StringContent(JsonSerializer.Serialize(newReservation), Encoding.UTF8, "application/json");
+                                await client.PostAsync("https://localhost:7143/api/Reservations", apiReqContent);
+                            }
+
+                            // Gizli etiketi metinden temizleyelim ki kullanıcı görmesin
+                            fullResponse = fullResponse.Replace(saveBlock, "").Trim();
+                        }
+                    }
+                    catch { }
+                }
+
+                if (!string.IsNullOrEmpty(fullResponse))
+                {
+                    history.Add(new GeminiContent { Role = "model", Parts = new List<GeminiPart> { new GeminiPart { Text = fullResponse } } });
+                    await Clients.Caller.SendAsync("ReceiveToken", fullResponse, cancellationToken);
+                }
             }
-
-            var full = sb.ToString();
-            history.Add(new GeminiContent
+            catch (Exception ex)
             {
-                Role = "model",
-                Parts = new List<GeminiPart> { new GeminiPart { Text = full } }
-            });
-
-            await Clients.Caller.SendAsync("CompleteMessage", full, cancellationToken);
+                await Clients.Caller.SendAsync("ReceiveToken", $"\n[Sistem Hatası]: {ex.Message}", cancellationToken);
+            }
+            finally
+            {
+                await Clients.Caller.SendAsync("CompleteMessage", "", cancellationToken);
+            }
         }
 
-        // --- Stream Parse Modelleri ---
+        // --- JSON DESERIALIZATION MODELLERİ (YENİ EKLENENLER) ---
         public sealed class GeminiStreamChunk { [JsonPropertyName("candidates")] public List<Candidate>? Candidates { get; set; } }
         public sealed class Candidate { [JsonPropertyName("content")] public GeminiContent? Content { get; set; } }
         public sealed class GeminiContent { [JsonPropertyName("role")] public string? Role { get; set; } [JsonPropertyName("parts")] public List<GeminiPart>? Parts { get; set; } }
-        public sealed class GeminiPart { [JsonPropertyName("text")] public string? Text { get; set; } }
+
+        public sealed class GeminiPart
+        {
+            [JsonPropertyName("text")][JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public string? Text { get; set; }
+            [JsonPropertyName("functionCall")][JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public FunctionCall? FunctionCall { get; set; }
+            [JsonPropertyName("functionResponse")][JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public FunctionResponse? FunctionResponse { get; set; }
+        }
+
+        public sealed class FunctionCall
+        {
+            [JsonPropertyName("name")] public string? Name { get; set; }
+            [JsonPropertyName("args")] public JsonElement? Args { get; set; }
+        }
+
+        public sealed class FunctionResponse
+        {
+            [JsonPropertyName("name")] public string? Name { get; set; }
+            [JsonPropertyName("response")] public object? Response { get; set; }
+        }
 
         // --- RAG İÇİN GÜNCEL DTO'LAR ---
         public class ProductDto

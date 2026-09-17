@@ -1,0 +1,180 @@
+﻿<!-- Yummy Sol Alt Chat Balonu CSS -->
+<style>
+    .chat-widget-btn {
+        position: fixed; bottom: 20px; right: 20px;
+        width: 60px; height: 60px; border-radius: 50%;
+        background-color: #ce1212; color: white; font-size: 28px; 
+        border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+        cursor: pointer; z-index: 9999; display: flex; 
+        align-items: center; justify-content: center; transition: transform 0.3s;
+    }
+    
+    .chat-widget-window {
+        position: fixed; bottom: 90px; right: 20px; 
+        width: 320px; height: 450px; background: white;
+        border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        display: none; flex-direction: column; z-index: 9999; 
+        overflow: hidden; border: 1px solid #ddd;
+    }
+    
+    .chat-header { background: #ce1212; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
+    .chat-body { flex: 1; padding: 15px; overflow-y: auto; background: #f8f9fa; font-size: 14px;}
+    .chat-footer { padding: 10px; background: white; border-top: 1px solid #ddd; display: flex; gap: 8px; }
+    .close-chat { cursor: pointer; font-size: 18px; line-height: 1; }
+
+    /* Daha yavaş ve zarif nefes alma efekti */
+    @@keyframes soft-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(206, 18, 18, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(206, 18, 18, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(206, 18, 18, 0); }
+    }
+    
+    .chatbot-float-btn {
+      animation: soft-pulse 2.5s infinite;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      border-radius: 50%;
+      background-color: #ce1212;
+      color: white;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .chatbot-float-btn:hover { 
+        transform: scale(1.08); 
+        background-color: #a80e0e; 
+    }
+
+    /* Kurumsal ve Zarif Karşılama Baloncuğu */
+    .chat-tooltip-bubble {
+      position: fixed;
+      bottom: 32px;
+      right: 95px;
+      background: #ffffff;
+      color: #555;
+      padding: 10px 18px;
+      border-radius: 8px; /* Daha premium köşeler */
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      z-index: 9998;
+      opacity: 0;
+      transform: translateX(15px);
+      /* Sayfa açıldıktan 1.5 saniye sonra zarifçe kayarak belirir */
+      animation: slideInFade 0.8s ease forwards 1.5s; 
+      pointer-events: none; /* Tıklamaları engellemez */
+    }
+
+    /* Baloncuğun sağındaki sivri konuşma oku */
+    .chat-tooltip-bubble::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -6px;
+      transform: translateY(-50%);
+      border-width: 6px 0 6px 6px;
+      border-style: solid;
+      border-color: transparent transparent transparent #ffffff;
+    }
+
+    @@keyframes slideInFade {
+      to { opacity: 1; transform: translateX(0); }
+    }
+</style>
+
+<!-- Kurumsal Karşılama Baloncuğu -->
+<div class="chat-tooltip-bubble">
+    Size nasıl yardımcı olabilirim?
+</div>
+
+<!-- Animasyonlu Sağ Alt Chatbot İkonu (SVG İkon ile) -->
+<button class="chatbot-float-btn" id="chatOpenBtn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9 9 0 0 0 8 15"/>
+    </svg>
+</button>
+
+<!-- Buradan sonrası senin yazdığın eski chatWindow HTML ve Javascript kodların (Onlara hiç dokunmuyoruz) -->
+
+<div class="chat-widget-window" id="chatWindow">
+    <div class="chat-header">
+        <span>Yummy Canlı Destek</span>
+        <span class="close-chat" id="chatCloseBtn">&times;</span>
+    </div>
+    <div class="chat-body" id="customerChat">
+        <div style="text-align:left; margin-bottom:10px;">
+            <span style="background:#e9ecef; padding:8px 12px; border-radius:15px 15px 15px 0; display:inline-block; color:#333;">Merhaba! Menümüz veya rezervasyon işlemleriniz hakkında size nasıl yardımcı olabilirim?</span>
+        </div>
+    </div>
+    <div id="customerTyping" style="padding-left:15px; font-style:italic; font-size:12px; color:gray; display:none; margin-bottom:5px;">Asistan yazıyor...</div>
+    <div class="chat-footer">
+        <input type="text" id="customerInput" class="form-control form-control-sm" placeholder="Bir şeyler sorun..." style="border-radius: 20px;" />
+        <button id="customerSendBtn" class="btn btn-danger btn-sm" style="border-radius: 20px; padding: 0 15px;">Gönder</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
+<script>
+    const chatWindow = document.getElementById('chatWindow');
+    document.getElementById('chatOpenBtn').addEventListener('click', () => chatWindow.style.display = 'flex');
+    document.getElementById('chatCloseBtn').addEventListener('click', () => chatWindow.style.display = 'none');
+
+    const chatBody = document.getElementById('customerChat');
+    const typeIndicator = document.getElementById('customerTyping');
+    const cusInput = document.getElementById('customerInput');
+    const cusSendBtn = document.getElementById('customerSendBtn');
+
+    let aiBufferEl = null;
+
+    const cusConn = new signalR.HubConnectionBuilder()
+        .withUrl("/chathub")
+        .withAutomaticReconnect()
+        .build();
+
+    cusConn.on("ReceiveUserEcho", (text) => {
+        const div = document.createElement('div');
+        div.style.margin = '10px 0'; div.style.textAlign = 'right';
+        div.innerHTML = `<span style="background-color:#ce1212; color:white; padding:8px 12px; border-radius:15px 15px 0 15px; display:inline-block;">${text}</span>`;
+        chatBody.appendChild(div);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    });
+
+    cusConn.on("ReceiveToken", (token) => {
+        typeIndicator.style.display = 'block';
+        if (!aiBufferEl) {
+            aiBufferEl = document.createElement('div');
+            aiBufferEl.style.margin = '10px 0'; aiBufferEl.style.textAlign = 'left';
+            aiBufferEl.innerHTML = `<span style="background-color:#e9ecef; color:#333; padding:8px 12px; border-radius:15px 15px 15px 0; display:inline-block;"><span class="ai-text"></span></span>`;
+            chatBody.appendChild(aiBufferEl);
+        }
+        aiBufferEl.querySelector('.ai-text').appendChild(document.createTextNode(token));
+        chatBody.scrollTop = chatBody.scrollHeight;
+    });
+
+    cusConn.on("CompleteMessage", () => {
+        typeIndicator.style.display = 'none';
+        aiBufferEl = null; 
+        chatBody.scrollTop = chatBody.scrollHeight;
+    });
+
+    cusConn.start().catch(err => console.error(err));
+
+    async function sendToCus() {
+        const text = cusInput.value.trim();
+        if (!text) return;
+        cusInput.value = "";
+        aiBufferEl = null;
+        typeIndicator.style.display = 'block';
+
+        await cusConn.invoke("SendMessage", text, "customer");
+    }
+
+    cusSendBtn.addEventListener('click', sendToCus);
+    cusInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendToCus(); });
+</script>
