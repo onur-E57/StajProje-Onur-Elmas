@@ -1,8 +1,12 @@
+using StajProje.WebUI.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Projeye HTML (View) desteğini ekliyoruz
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
+// SignalR servisini projeye dahil ediyoruz
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -25,5 +29,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Default}/{action=Index}/{id?}");
+// JavaScript'in aradığı /chathub adresini bizim ChatHub sınıfına bağlıyoruz
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();

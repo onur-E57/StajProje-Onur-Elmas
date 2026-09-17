@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = "SendChatWithAI";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<!-- Chat Arayüzü -->
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Yummy Canlı Destek Asistanı</h5>
+        </div>
+        <div class="card-body">
+            <div id="chat" style="border:1px solid #ddd; border-radius:8px; padding:15px; min-height:400px; max-height:400px; overflow-y:auto; white-space:pre-wrap; background-color:#fafafa;"></div>
+
+            <div id="typing" style="opacity:.6; font-style:italic; margin-top:10px; display:none; color:#555;">
+                Yummy Asistan yazıyor...
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <input id="messageInput" class="form-control" type="text" placeholder="Mesajınızı buraya yazın..." />
+                <button id="sendBtn" class="btn btn-warning px-4 fw-bold">Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
+<script>
+    const chat = document.getElementById('chat');
+    const typing = document.getElementById('typing');
+    const input = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    let bufEl = null;
+
+    const conn = new signalR.HubConnectionBuilder()
+        .withUrl("/chathub")
+        .withAutomaticReconnect()
+        .build();
+
+    // 1. Müşterinin kendi yazdığı mesaj
+    conn.on("ReceiveUserEcho", (text) => {
+        const div = document.createElement('div');
+        div.style.margin = '10px 0';
+        div.style.textAlign = 'right'; // Kullanıcı mesajını sağa yasladık
+        div.innerHTML = `<span style="background-color:#007bff; color:white; padding:8px 15px; border-radius:15px 15px 0 15px; display:inline-block;">${text}</span>`;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+    });
+
+    // 2. Yapay Zekadan harf harf gelen cevap
+    conn.on("ReceiveToken", (token) => {
+        typing.style.display = 'block';
+
+        if (!bufEl) {
+            bufEl = document.createElement('div');
+            bufEl.style.margin = '10px 0';
+            bufEl.style.textAlign = 'left';
+
+            // Asistanın adını belirttik ve güvenli TextNode yapısına geçtik
+            bufEl.innerHTML = `<span style="background-color:#e9ecef; color:#333; padding:8px 15px; border-radius:15px 15px 15px 0; display:inline-block;"><strong>Yummy Asistan: </strong><span class="ai-text"></span></span>`;
+            chat.appendChild(bufEl);
+        }
+
+        // Gelen harfleri güvenli bir şekilde ekliyoruz
+        const textContainer = bufEl.querySelector('.ai-text');
+        textContainer.appendChild(document.createTextNode(token));
+
+        chat.scrollTop = chat.scrollHeight;
+    });
+
+    // 3. Mesajın tamamlanması
+    conn.on("CompleteMessage", (_full) => {
+        typing.style.display = 'none';
+        bufEl = null; // Bir sonraki mesaj için buffer'ı sıfırla
+        chat.scrollTop = chat.scrollHeight;
+    });
+
+    async function start() {
+        try {
+            await conn.start();
+            console.log("SignalR bağlantısı başarılı!");
+        } catch (e) {
+            console.error("Bağlantı hatası:", e);
+            setTimeout(start, 1500);
+        }
+    }
+
+    start();
+
+    async function send() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = "";
+        bufEl = null;
+        typing.style.display = 'block';
+
+        // Backend'deki C# SendMessage metodunu tetikliyoruz
+        await conn.invoke("SendMessage", text);
+    }
+
+    sendBtn.addEventListener('click', send);
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') send();
+    });
+</script>

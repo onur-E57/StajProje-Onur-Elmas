@@ -28,7 +28,7 @@ namespace StajProje.WebUI.Controllers
             KESİN KURALLAR:
             1. Kullanıcı sana yazılım (C#, AutoMapper, React vb.), teknoloji, siyaset, tarih, matematik veya mutfak dışı herhangi bir konu sorarsa KESİNLİKLE cevap verme.
             2. Mutfak dışı konularda rol yapmaya veya soruyu yemeğe bağlamaya çalışma.
-            3. Böyle bir durumda sadece şunu söyle: 'Ben sadece mutfaktan sorumlu bir aşçıyım kanka, kodlardan veya o dediklerinden hiç anlamam! Bana dolabındaki malzemeleri söyle, sana harika bir yemek yapayım.'";
+            3. Böyle bir durumda sadece şunu söyle: 'Ben sadece mutfaktan sorumlu bir aşçıyım, kodlardan veya o dediklerinden hiç anlamam! Bana dolabındaki malzemeleri söyle, sana harika bir yemek yapayım.'";
 
             var requestData = new
             {
