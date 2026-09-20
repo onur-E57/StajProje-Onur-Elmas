@@ -79,11 +79,11 @@ namespace StajProje.WebUI.Controllers
                 }
                 // --- Restorana E-Posta Bildirimi Gönderme İşlemi Bitişi ---
 
-                TempData["MessageSuccess"] = "Mesajınız başarıyla gönderildi! Sizi aramızda görmek için sabırsızlanıyoruz.";
+                TempData["SuccessMessage"] = "Mesajınız başarıyla gönderildi! Sizi aramızda görmek için sabırsızlanıyoruz.";
             }
             else
             {
-                TempData["MessageSuccess"] = "Mesaj gönderilirken bir hata oluştu, lütfen tekrar deneyin.";
+                TempData["SuccessMessage"] = "Mesaj gönderilirken bir hata oluştu, lütfen tekrar deneyin.";
             }
 
             return RedirectToAction("Index", "Default");

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StajProje.WebUI.Dtos.MessageDtos;
@@ -229,139 +230,88 @@ namespace StajProje.WebUI.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> SendMessage(CreateMessageDto createMessageDto)
         {
+            createMessageDto.SendDate = DateTime.Now;
+            createMessageDto.IsRead = false;
             // 1. Dış Dünyaya (Hugging Face) gidecek olan kurye
             var aiClient = _httpClientFactory.CreateClient();
+
             var token = _configuration["HuggingFaceConfig:ApiKey"];
             aiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             try
             {
-                var translateRequestBody = new
+                // Direkt Türkçe Müşteri Memnuniyeti (Duygu Analizi) Modeli
+                var sentimentRequestBody = new { inputs = createMessageDto.MessageDetails };
+                var sentimentJson = System.Text.Json.JsonSerializer.Serialize(sentimentRequestBody);
+                var sentimentContent = new StringContent(sentimentJson, Encoding.UTF8, "application/json");
+
+                var response = await aiClient.PostAsync("https://api-inference.huggingface.co/models/savasy/bert-base-turkish-sentiment-cased", sentimentContent);
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode) // API başarılı yanıt (200 OK) döndüyse
                 {
-                    inputs = createMessageDto.MessageDetails
-                };
-                var translateJson = System.Text.Json.JsonSerializer.Serialize(translateRequestBody);
-                var translateContent = new StringContent(translateJson, Encoding.UTF8, "application/json");
-                var translateResponse = await aiClient.PostAsync("https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-tr-en", translateContent);
-                var translateResponseString = await translateResponse.Content.ReadAsStringAsync();
-
-                string englishText = createMessageDto.MessageDetails;
-
-                if (translateResponseString.TrimStart().StartsWith("["))
-                {
-                    var translateDoc = JsonDocument.Parse(translateResponseString);
-                    englishText = translateDoc.RootElement[0].GetProperty("translation_text").GetString();
-                }
-
-                // 🕵️‍♂️ DEDEKTİF KONTROL NOKTASI 1: Çeviri işleminden hemen sonra, toksik sorgusundan önce!
-                Console.WriteLine("=========== DEDEKTİF RAPORU 1 ===========");
-                Console.WriteLine("Orijinal Mesaj: " + createMessageDto.MessageDetails);
-                Console.WriteLine("Çeviri Sonucu: " + englishText);
-                Console.WriteLine("=========================================");
-
-                var toxicityRequestBody = new
-                {
-                    inputs = englishText
-                };
-                var toxicityJson = System.Text.Json.JsonSerializer.Serialize(toxicityRequestBody);
-                var toxicityContent = new StringContent(toxicityJson, Encoding.UTF8, "application/json");
-                var toxicityResponse = await aiClient.PostAsync("https://api-inference.huggingface.co/models/unitary/toxic-bert", toxicityContent);
-
-                // API'nin ham cevabını string olarak alıyoruz
-                var toxicityResponseString = await toxicityResponse.Content.ReadAsStringAsync();
-
-                // 🕵️‍♂️ DEDEKTİF KONTROL NOKTASI 2: Ham cevabı aldığımız gibi, FOREACH'E GİRMEDEN ÖNCE ekrana basıyoruz!
-                Console.WriteLine("=========== DEDEKTİF RAPORU 2 ===========");
-                Console.WriteLine("Toksik API Ham Cevabı: " + toxicityResponseString);
-                Console.WriteLine("=========================================");
-
-                if (toxicityResponseString.TrimStart().StartsWith("["))
-                {
-                    var toxicityDoc = JsonDocument.Parse(toxicityResponseString);
-                    foreach (var item in toxicityDoc.RootElement[0].EnumerateArray())
+                    if (responseString.TrimStart().StartsWith("["))
                     {
-                        string label = item.GetProperty("label").GetString();
-                        double score = item.GetProperty("score").GetDouble();
-                        if (score > 0.5)
+                        var doc = JsonDocument.Parse(responseString);
+                        var rootArray = doc.RootElement;
+
+                        // Modelin iç içe (nested) dizi dönme ihtimaline karşı güvenlik kontrolü
+                        if (rootArray.GetArrayLength() > 0 && rootArray[0].ValueKind == JsonValueKind.Array)
                         {
-                            createMessageDto.Status = "Toksik";
-                            break;
+                            rootArray = rootArray[0];
+                        }
+
+                        // Güvenli okuma: Patlamayı önlemek için TryGetProperty kullanıyoruz
+                        foreach (var item in rootArray.EnumerateArray())
+                        {
+                            if (item.TryGetProperty("label", out var labelProp) && item.TryGetProperty("score", out var scoreProp))
+                            {
+                                string label = labelProp.GetString();
+                                double score = scoreProp.GetDouble();
+
+                                if ((label == "negative" || label == "LABEL_0") && score > 0.5)
+                                {
+                                    createMessageDto.Status = "Şikayet / İnceleme Bekliyor";
+                                    break;
+                                }
+                            }
                         }
                     }
+                }
+                else
+                {
+                    // Eğer model uykudaysa (503) veya Token yanlışsa (401), hatayı veritabanına yaz!
+                    createMessageDto.Status = $"HF Reddedildi: {response.StatusCode}";
+                }
+
+                if (string.IsNullOrEmpty(createMessageDto.Status))
+                {
+                    createMessageDto.Status = "Standart (Olumlu)";
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Yapay zeka (Hugging Face) servisine ulaşılamadı: " + ex.Message);
+                // C# tarafında başka bir Exception patlarsa, tam hatayı DB'ye yazdıralım ki katili bulalım!
+                string errorMsg = ex.Message;
+                if (errorMsg.Length > 50) errorMsg = errorMsg.Substring(0, 50); // DB kolonuna sığması için kısaltıyoruz
+                createMessageDto.Status = $"Kod Hatası: {errorMsg}";
             }
 
-            // --- GARANTİ BÖLGE: TRY-CATCH'TEN KURTULUP BURAYA GELDİK ---
-            // Eğer HuggingFace patladıysa veya mesaj temizse (Toksik değilse), Status null kalmasın:
-            if (string.IsNullOrEmpty(createMessageDto.Status))
-            {
-                createMessageDto.Status = "Standart";
-            }
-            // ------------------------------------------------------------
-
-            createMessageDto.IsRead = false;
-            createMessageDto.SendDate = DateTime.Now;
-
-            var client = _httpClientFactory.CreateClient();
+            // 2. Kendi API'ne (Yummy Veritabanına) gidecek olan kurye
+            var apiClient = _httpClientFactory.CreateClient();
             var jsonData = JsonConvert.SerializeObject(createMessageDto);
             StringContent stringContent = new StringContent(jsonData, Encoding.UTF8, "application/json");
-
-            // Veriyi API'deki MessageController'ına (mutfağa) gönderiyoruz
-            var responseMessage = await client.PostAsync("https://localhost:7143/api/Messages", stringContent);
+            var responseMessage = await apiClient.PostAsync("https://localhost:7143/api/Messages", stringContent);
 
             if (responseMessage.IsSuccessStatusCode)
             {
-                // --- MAİL GÖNDERME İŞLEMİ ---
-                try
-                {
-                    string smtpServer = _configuration["MailConfig:SmtpServer"];
-                    int port = Convert.ToInt32(_configuration["MailConfig:Port"]);
-                    string senderEmail = _configuration["MailConfig:SenderEmail"];
-                    string senderPassword = _configuration["MailConfig:SenderPassword"];
-
-                    using (SmtpClient smtpClient = new SmtpClient(smtpServer, port))
-                    {
-                        smtpClient.Credentials = new NetworkCredential(senderEmail, senderPassword);
-                        smtpClient.EnableSsl = true;
-
-                        MailMessage mailMessage = new MailMessage();
-                        mailMessage.From = new MailAddress(senderEmail, "Yummy Web İletişim Formu");
-                        mailMessage.To.Add(senderEmail); // Restoranın kendi mailine bildirim
-                        mailMessage.Subject = "YENİ MÜŞTERİ MESAJI: " + createMessageDto.Subject;
-                        mailMessage.Body = $"Web sitenizden yeni bir iletişim formu dolduruldu.\n\n" +
-                                           $"Müşteri Adı: {createMessageDto.NameSurname}\n" +
-                                           $"E-Posta: {createMessageDto.Email}\n" +
-                                           $"Konu: {createMessageDto.Subject}\n\n" +
-                                           $"Mesaj Detayı:\n{createMessageDto.MessageDetails}";
-                        mailMessage.IsBodyHtml = false;
-
-                        await smtpClient.SendMailAsync(mailMessage);
-                    }
-                }
-                catch (Exception)
-                {
-                    // Google SMTP anlık hata verirse sistem çökmesin diye hatayı eziyoruz
-                }
-                // ---------------------------------------------
-
-                TempData["MessageSuccess"] = "Mesajınız başarıyla gönderildi! Sizi aramızda görmek için sabırsızlanıyoruz.";
+                TempData["SuccessMessage"] = "Mesajınız başarıyla gönderildi, en kısa sürede dönüş yapacağız!";
+                return RedirectToAction("Index", "Default");
             }
-            else
-            {
-                // API'nin gönderdiği gerçek hata mesajını okuyoruz
-                var errorDetail = await responseMessage.Content.ReadAsStringAsync();
-
-                // Hatayı ekrana basıyoruz ki katilin kim olduğunu görelim
-                TempData["MessageSuccess"] = $"API Hata Kodu: {responseMessage.StatusCode} | Detay: {errorDetail}";
-            }
-
-            return RedirectToAction("Index", "Default");
+            return View();
         }
     }
 }

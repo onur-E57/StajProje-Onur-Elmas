@@ -70,5 +70,33 @@ namespace StajProje.WebApi.Controllers
             _context.SaveChanges();
             return Ok("Güncelleme işlemi başarılı");
         }
+
+        [HttpGet("GetTotalReservationCount")]
+        public IActionResult GetTotalReservationCount()
+        {
+            var values = _context.Reservations.Count();
+            return Ok(values);
+        }
+
+        [HttpGet("GetTotalCustomerCount")]
+        public IActionResult GetTotalCustomerCount()
+        {
+            var values = _context.Reservations.Sum(x => x.CountofPeople);
+            return Ok(values);
+        }
+
+        [HttpGet("GetPendingReservationsCount")]
+        public IActionResult GetPendingReservationsCount()
+        {
+            var values = _context.Reservations.Where(x => x.ReservationStatus == "Beklemede").Count();
+            return Ok(values);
+        }
+
+        [HttpGet("GetApprovedReservationsCount")]
+        public IActionResult GetApprovedReservationsCount()
+        {
+            var values = _context.Reservations.Where(x => x.ReservationStatus == "Onaylandı").Count();
+            return Ok(values);
+        }
     }
 }
