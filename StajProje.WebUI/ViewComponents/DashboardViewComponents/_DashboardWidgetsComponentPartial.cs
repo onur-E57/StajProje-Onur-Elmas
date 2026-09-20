@@ -28,8 +28,23 @@ namespace StajProje.WebUI.ViewComponents.DashboardViewComponents
             var jsonData = await response.Content.ReadAsStringAsync();
             ViewBag.v1 = jsonData;
             ViewBag.r1 = r1;
+
+            var client2 = _httpClientFactory.CreateClient();
+            var response2 = await client2.GetAsync("https://localhost:7143/api/Reservations/GetTotalCustomerCount");
+            var jsonData2 = await response2.Content.ReadAsStringAsync();
+            ViewBag.v2 = jsonData2;
             ViewBag.r2 = r2;
+
+            var client3 = _httpClientFactory.CreateClient();
+            var response3 = await client3.GetAsync("https://localhost:7143/api/Reservations/GetPendingReservationsCount");
+            var jsonData3 = await response3.Content.ReadAsStringAsync();
+            ViewBag.v3 = jsonData3;
             ViewBag.r3 = r3;
+
+            var client4 = _httpClientFactory.CreateClient();
+            var response4 = await client4.GetAsync("https://localhost:7143/api/Reservations/GetApprovedReservationsCount");
+            var jsonData4 = await response4.Content.ReadAsStringAsync();
+            ViewBag.v4 = jsonData4;
             ViewBag.r4 = r4;
 
             return View();
