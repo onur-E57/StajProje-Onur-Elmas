@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using StajProje.WebUI.Dtos.ReservationDtos;
 using System.Net.Http;
 
 namespace StajProje.WebUI.ViewComponents.DashboardViewComponents
@@ -13,25 +13,17 @@ namespace StajProje.WebUI.ViewComponents.DashboardViewComponents
         {
             _httpClientFactory = httpClientFactory;
         }
-
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var vm = new RevenueChartViewModel
-            {
-                Labels = new List<string> { "Jan", "Feb", "Mar", "Apr", "May", "Jun" },
-                Income = new List<int> { 5, 15, 14, 36, 32, 32 },
-                Expense = new List<int> { 7, 11, 30, 18, 25, 13 },
-                WeeklyEarnings = 675,
-                MonthlyEarnings = 1587,
-                YearlyEarnings = 45965,
-                TotalCustomers = 8257,
-                TotalIncome = 9857,
-                ProjectCompleted = 28,
-                TotalExpense = 6287,
-                NewCustomers = 684
-            };
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri("https://localhost:7143"); // API adresin burası olacak
 
-            return View(vm);
+            var response = await client.GetAsync("api/Reservations/GetReservationStats");
+            var json = await response.Content.ReadAsStringAsync();
+
+            var data = JsonConvert.DeserializeObject<List<ReservationChartDto>>(json);
+
+            return View(data);
         }
     }
 }

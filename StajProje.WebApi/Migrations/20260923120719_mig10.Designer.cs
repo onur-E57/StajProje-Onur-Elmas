@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StajProje.WebApi.Context;
 
@@ -11,9 +12,10 @@ using StajProje.WebApi.Context;
 namespace StajProje.WebApi.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    partial class ApiContextModelSnapshot : ModelSnapshot
+    [Migration("20260923120719_mig10")]
+    partial class mig10
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,6 +155,9 @@ namespace StajProje.WebApi.Migrations
                     b.Property<DateTime>("AssignDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ChefId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
@@ -173,30 +178,9 @@ namespace StajProje.WebApi.Migrations
 
                     b.HasKey("EmployeeTaskId");
 
-                    b.ToTable("EmployeeTasks");
-                });
-
-            modelBuilder.Entity("StajProje.WebApi.Entities.EmployeeTaskChef", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("ChefId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmployeeTaskId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
                     b.HasIndex("ChefId");
 
-                    b.HasIndex("EmployeeTaskId");
-
-                    b.ToTable("EmployeeTaskChefs");
+                    b.ToTable("EmployeeTask");
                 });
 
             modelBuilder.Entity("StajProje.WebApi.Entities.Feature", b =>
@@ -483,23 +467,15 @@ namespace StajProje.WebApi.Migrations
                     b.ToTable("YummyEvents");
                 });
 
-            modelBuilder.Entity("StajProje.WebApi.Entities.EmployeeTaskChef", b =>
+            modelBuilder.Entity("StajProje.WebApi.Entities.EmployeeTask", b =>
                 {
                     b.HasOne("StajProje.WebApi.Entities.Chef", "Chef")
-                        .WithMany("EmployeeTaskChefs")
+                        .WithMany("EmployeeTasks")
                         .HasForeignKey("ChefId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("StajProje.WebApi.Entities.EmployeeTask", "EmployeeTask")
-                        .WithMany("EmployeeTaskChefs")
-                        .HasForeignKey("EmployeeTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Chef");
-
-                    b.Navigation("EmployeeTask");
                 });
 
             modelBuilder.Entity("StajProje.WebApi.Entities.Product", b =>
@@ -518,12 +494,7 @@ namespace StajProje.WebApi.Migrations
 
             modelBuilder.Entity("StajProje.WebApi.Entities.Chef", b =>
                 {
-                    b.Navigation("EmployeeTaskChefs");
-                });
-
-            modelBuilder.Entity("StajProje.WebApi.Entities.EmployeeTask", b =>
-                {
-                    b.Navigation("EmployeeTaskChefs");
+                    b.Navigation("EmployeeTasks");
                 });
 #pragma warning restore 612, 618
         }

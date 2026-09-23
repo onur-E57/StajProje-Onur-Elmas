@@ -7,6 +7,7 @@ using StajProje.WebApi.Dtos.ProductDtos;
 using StajProje.WebApi.Dtos.ReservationDtos;
 using StajProje.WebApi.Dtos.ImageDtos;
 using StajProje.WebApi.Dtos.ContactDtos;
+using StajProje.WebApi.Dtos.EmployeeTaskDtos;
 using StajProje.WebApi.Entities;
 
 namespace StajProje.WebApi.Mapping
@@ -53,6 +54,11 @@ namespace StajProje.WebApi.Mapping
             CreateMap<Contact, UpdateContactDto>().ReverseMap();
             CreateMap<Contact, GetByIdContactDto>().ReverseMap();
             CreateMap<Contact, ResultContactDto>().ReverseMap();
+
+            CreateMap<EmployeeTask, CreateEmployeeTaskDto>().ReverseMap();
+            CreateMap<EmployeeTask, UpdateEmployeeTaskDto>().ReverseMap();
+            CreateMap<EmployeeTask, GetByIdEmployeeTaskDto>().ReverseMap();
+            CreateMap<EmployeeTask, ResultEmployeeTaskDto>().ReverseMap();
         }
     }
 }
