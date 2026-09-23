@@ -89,6 +89,8 @@ namespace StajProje.WebUI.Controllers
             return RedirectToAction("Index", "Default");
         }
         */
+        
+        /*
         [HttpPost]
         public async Task<IActionResult> BookTable(CreateReservationDto createReservationDto)
         {
@@ -114,5 +116,6 @@ namespace StajProje.WebUI.Controllers
 
             return RedirectToAction("Index", "Default");
         }
+        */
     }
 }

@@ -215,7 +215,7 @@ Sadece ve sadece müşteri onay verdikten sonra, yanıtının en sonuna KESİNL�
                                     ReservationTime = p[4].Trim(),
                                     CountofPeople = int.Parse(p[5].Trim()),
                                     Message = "Yapay Zeka Canlı Destek Üzerinden Alındı",
-                                    ReservationStatus = "Onaylandı"
+                                    ReservationStatus = "Beklemede"
                                 };
 
                                 var apiReqContent = new StringContent(JsonSerializer.Serialize(newReservation), Encoding.UTF8, "application/json");

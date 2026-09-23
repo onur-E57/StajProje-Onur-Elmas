@@ -94,5 +94,29 @@ namespace StajProje.WebUI.Controllers
             }
             return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> BookTable(CreateReservationDto createReservationDto)
+        {
+            createReservationDto.ReservationStatus = "Beklemede";
+
+            var client = _httpClientFactory.CreateClient();
+            var jsonData = JsonConvert.SerializeObject(createReservationDto);
+            StringContent stringContent = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+            // Veriyi API'deki ReservationController'ına (mutfağa) gönderiyoruz
+            var responseMessage = await client.PostAsync("https://localhost:7143/api/Reservations", stringContent);
+
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                TempData["ReservationSuccess"] = "Masanız başarıyla ayrıldı! Sizi aramızda görmek için sabırsızlanıyoruz.";
+            }
+            else
+            {
+                TempData["ReservationSuccess"] = "Rezervasyon alınırken bir hata oluştu, lütfen tekrar deneyin.";
+            }
+
+            return RedirectToAction("Index", "Default");
+        }
     }
 }

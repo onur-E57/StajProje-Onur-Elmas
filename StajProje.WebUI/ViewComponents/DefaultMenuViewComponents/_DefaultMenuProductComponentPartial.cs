@@ -16,7 +16,7 @@ namespace StajProje.WebUI.ViewComponents.DefaultMenuViewComponents
         public async Task<IViewComponentResult> InvokeAsync()
         {
             var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync("https://localhost:7143/api/Products/");
+            var response = await client.GetAsync("https://localhost:7143/api/Products/ProductListWithCategory/");
 
             if (response.IsSuccessStatusCode)
             {
